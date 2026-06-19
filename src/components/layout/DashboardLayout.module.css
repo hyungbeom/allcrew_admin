@@ -1,0 +1,19 @@
+.root {
+  min-height: 100vh;
+}
+
+.body {
+  min-height: 100vh;
+}
+
+.main {
+  min-height: calc(100vh - 56px);
+  transition: margin-left 0.2s;
+}
+
+.content {
+  margin: 0;
+  padding: 24px;
+  min-height: calc(100vh - 56px);
+  background: #ffffff;
+}

@@ -1,0 +1,153 @@
+.equalCol {
+  display: flex;
+}
+
+.equalCard {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.equalCard :global(.ant-card-body) {
+  flex: 1;
+}
+
+.attendanceCard :global(.ant-card-body) {
+  padding: 16px 24px 24px !important;
+}
+
+.attendanceSummary {
+  margin-bottom: 4px;
+}
+
+.attendanceProgressWrap {
+  width: 100%;
+  margin: 20px 0 28px;
+}
+
+.attendanceProgressWrap :global(.ant-progress) {
+  width: 100%;
+  margin: 0;
+  line-height: 1;
+}
+
+.attendanceProgressWrap :global(.ant-progress-outer) {
+  width: 100% !important;
+}
+
+.attendanceProgressWrap :global(.ant-progress-inner) {
+  height: 10px;
+  background-color: #f0f0f0;
+  border-radius: 100px;
+}
+
+.attendanceProgressWrap :global(.ant-progress-bg) {
+  height: 10px !important;
+  border-radius: 100px;
+}
+
+.attendanceStatsRow {
+  margin-top: auto;
+}
+
+.statCol {
+  display: flex;
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+}
+
+.statItemContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.statItemProgress {
+  flex-shrink: 0;
+  line-height: 0;
+}
+
+.statItemProgress :global(.ant-progress-circle) {
+  display: block;
+}
+
+.statItemLabel {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.statItemValue {
+  margin: 0 !important;
+  font-size: 28px !important;
+  line-height: 1 !important;
+  font-weight: 600 !important;
+}
+
+.taskCol {
+  display: flex;
+}
+
+.taskCard {
+  width: 100%;
+}
+
+.taskCard :global(.ant-statistic-content) {
+  font-variant-numeric: tabular-nums;
+}
+
+.siteCard :global(.ant-card-body) {
+  padding: 16px 24px 24px !important;
+}
+
+.siteList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  padding: 4px 0;
+}
+
+.siteHeaderButton {
+  height: 32px;
+  padding-inline: 12px;
+  font-size: 13px;
+}
+
+.siteItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+}
+
+.siteItemIcon {
+  background-color: #fff !important;
+  color: rgba(0, 0, 0, 0.65) !important;
+  border: 1px solid #f0f0f0;
+}
+
+.siteItemLabel {
+  color: rgba(0, 0, 0, 0.88);
+  font-size: 14px;
+}
+
+.siteItemValue {
+  margin: 0 !important;
+  font-size: 20px !important;
+  line-height: 1 !important;
+  color: rgba(0, 0, 0, 0.88);
+}

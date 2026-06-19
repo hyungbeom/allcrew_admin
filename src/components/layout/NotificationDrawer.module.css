@@ -1,0 +1,91 @@
+.drawer :global(.ant-drawer-header) {
+  padding: 16px 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.drawer :global(.ant-drawer-header-title) {
+  flex: 1;
+  min-width: 0;
+}
+
+.drawer :global(.ant-drawer-extra) {
+  flex-shrink: 0;
+}
+
+.sectionHeader {
+  padding: 8px 24px;
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.item {
+  display: flex;
+  gap: 12px;
+  padding: 14px 24px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.item:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.itemUnread {
+  background-color: #e6f4ff;
+}
+
+.itemUnread:hover {
+  background-color: #bae0ff;
+}
+
+.itemAvatar {
+  flex-shrink: 0;
+  background-color: #fff !important;
+  color: rgba(0, 0, 0, 0.45) !important;
+  border: 1px solid #f0f0f0;
+}
+
+.itemBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.itemMeta {
+  margin-bottom: 6px;
+}
+
+.itemTag {
+  margin: 0;
+  font-size: 11px;
+  line-height: 18px;
+  color: rgba(0, 0, 0, 0.65);
+  background: #f5f5f5;
+  border: none;
+}
+
+.itemTime {
+  flex-shrink: 0;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.itemTitle {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.itemDescription {
+  display: block;
+  font-size: 13px;
+  line-height: 1.5;
+}
