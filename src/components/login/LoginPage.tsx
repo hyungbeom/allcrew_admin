@@ -123,7 +123,7 @@ export default function LoginPage() {
         <div className={styles.visualContent}>
           <div className={styles.brand}>
             <BrandIcon />
-            <span className={styles.brandName}>Ibrahim MEMON</span>
+            <span className={styles.brandName}>ALL CREW</span>
           </div>
 
           <div className={styles.headline}>
