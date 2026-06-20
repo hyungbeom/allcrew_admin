@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AppleOutlined,
   CheckOutlined,
@@ -29,6 +29,7 @@ import {
   signupEmployee,
   signupRepresentative,
 } from "@/lib/api/auth";
+import { getAppHostPrefix, getAppOrigin } from "@/lib/appOrigin";
 import { normalizeCompanySlug } from "@/lib/companyPaths";
 import { ApiError } from "@/lib/api/client";
 import styles from "./SignupPage.module.css";
@@ -89,6 +90,13 @@ export default function SignupPage() {
   const [businessChecked, setBusinessChecked] = useState(false);
   const [slugChecked, setSlugChecked] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [hostPrefix, setHostPrefix] = useState(getAppHostPrefix);
+  const [appOrigin, setAppOrigin] = useState(getAppOrigin);
+
+  useEffect(() => {
+    setHostPrefix(getAppHostPrefix());
+    setAppOrigin(getAppOrigin());
+  }, []);
 
   const signupType = Form.useWatch("signupType", form) ?? "representative";
 
@@ -478,7 +486,7 @@ export default function SignupPage() {
             <Space.Compact block>
               <Input
                 readOnly
-                value="localhost:3000/"
+                value={hostPrefix}
                 tabIndex={-1}
                 className={styles.slugPrefixInput}
               />
@@ -507,7 +515,7 @@ export default function SignupPage() {
             <Button onClick={handleSlugCheck}>중복 확인</Button>
           </div>
           <Typography.Text type="secondary" className={styles.fieldHint}>
-            가입 후 접속 주소: http://localhost:3000/기업영문이름/dashboard
+            가입 후 접속 주소: {appOrigin}/기업영문이름/dashboard
           </Typography.Text>
         </Form.Item>
         <Form.Item label="사업자등록번호" required>
