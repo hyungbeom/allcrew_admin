@@ -128,7 +128,7 @@ export default function LoginPage() {
 
           <div className={styles.headline}>
             <p className={styles.headlineTop}>행사관리의 시작</p>
-            <p className={styles.headlineAccent}>ALL CREW로 시작하세요</p>
+            <p className={styles.headlineAccent}>ALL CREW로 시작</p>
           </div>
         </div>
       </section>
