@@ -1,10 +1,12 @@
 "use client";
 
 import { FolderOutlined, PlusOutlined } from "@ant-design/icons";
-import { Avatar, Button, Card, Empty, Input, Select, Typography } from "antd";
-import { useMemo, useState } from "react";
-import { projectFilterOptions } from "@/components/crew-db/crewData";
-import { chatRooms, getChatTypeCounts, type ChatRoom, type ChatTypeFilter } from "./chatData";
+import { App, Avatar, Button, Card, Empty, Input, Select, Typography } from "antd";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useProjectFilterOptions } from "@/hooks/useProjectFilterOptions";
+import { ApiError } from "@/lib/api/client";
+import { fetchChatRooms } from "@/lib/api/operations";
+import { getChatTypeCounts, type ChatRoom, type ChatTypeFilter } from "./chatData";
 import styles from "./ChatPage.module.css";
 
 const typeFilters: { key: ChatTypeFilter; label: string }[] = [
@@ -14,12 +16,35 @@ const typeFilters: { key: ChatTypeFilter; label: string }[] = [
 ];
 
 export default function ChatPage() {
+  const { message } = App.useApp();
+  const { options: projectFilterOptions } = useProjectFilterOptions();
   const [projectFilter, setProjectFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState<ChatTypeFilter>("all");
   const [searchText, setSearchText] = useState("");
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
+  const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const typeCounts = useMemo(() => getChatTypeCounts(chatRooms), []);
+  const loadChatRooms = useCallback(async () => {
+    setLoading(true);
+    try {
+      const items = await fetchChatRooms();
+      setChatRooms(items);
+      setSelectedRoomId((prev) => prev ?? items[0]?.id ?? null);
+    } catch (error) {
+      const errorMessage =
+        error instanceof ApiError ? error.message : "채팅 목록을 불러오지 못했습니다.";
+      message.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, [message]);
+
+  useEffect(() => {
+    void loadChatRooms();
+  }, [loadChatRooms]);
+
+  const typeCounts = useMemo(() => getChatTypeCounts(chatRooms), [chatRooms]);
 
   const filteredRooms = useMemo(() => {
     const keyword = searchText.trim().toLowerCase();
@@ -34,7 +59,7 @@ export default function ChatPage() {
         room.preview.toLowerCase().includes(keyword)
       );
     });
-  }, [projectFilter, searchText, typeFilter]);
+  }, [chatRooms, projectFilter, searchText, typeFilter]);
 
   return (
     <div className={styles.page}>

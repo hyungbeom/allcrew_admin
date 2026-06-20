@@ -1,0 +1,402 @@
+.modal :global(.ant-modal-content) {
+  padding: 0;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.modal :global(.ant-modal-body) {
+  padding: 0;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  max-height: min(88vh, 820px);
+}
+
+.header {
+  padding: 24px 28px 0;
+}
+
+.stepLabel {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1677ff;
+}
+
+.title {
+  margin: 0 0 6px !important;
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+}
+
+.subtitle {
+  display: block;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.stepsWrap {
+  padding: 20px 28px 0;
+}
+
+.stepsWrap :global(.ant-steps-navigation) {
+  padding-top: 0;
+}
+
+.stepsWrap :global(.ant-steps-item-container) {
+  padding-bottom: 12px;
+}
+
+.body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 28px;
+}
+
+.formSection {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.fieldLabel {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.required {
+  color: #ff4d4f;
+}
+
+.eventTypeGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.eventTypeButton {
+  height: 36px;
+  padding: 0 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 999px;
+  background: #fff;
+  color: rgba(0, 0, 0, 0.65);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.eventTypeButton:hover {
+  border-color: #141414;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.eventTypeButtonActive {
+  border-color: #141414;
+  background: #141414;
+  color: #fff;
+}
+
+.uploadBox :global(.ant-upload-drag) {
+  border-radius: 10px;
+  background: #fafafa;
+}
+
+.uploadHint {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.locationButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 44px;
+  border: 1px dashed #d9d9d9;
+  border-radius: 8px;
+  background: #fafafa;
+  color: rgba(0, 0, 0, 0.65);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.locationButton:hover {
+  border-color: #1677ff;
+  color: #1677ff;
+}
+
+.infoBox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #f5f5f5;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+  line-height: 1.5;
+}
+
+.infoIcon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #1677ff;
+}
+
+.positionCard {
+  padding: 16px;
+  border: 1px solid #f0f0f0;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.positionRow {
+  display: grid;
+  grid-template-columns: 1fr 88px 36px;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.payRow {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.payTypeGroup {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: 8px;
+  background: #f5f5f5;
+}
+
+.payTypeButton {
+  min-width: 52px;
+  height: 32px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(0, 0, 0, 0.65);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.payTypeButtonActive {
+  background: #141414;
+  color: #fff;
+}
+
+.deleteButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+}
+
+.deleteButton:hover {
+  background: #fff1f0;
+  color: #ff4d4f;
+}
+
+.addPositionButton {
+  margin-top: 12px;
+}
+
+.summaryBox {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 20px;
+  border-radius: 10px;
+  background: #fafafa;
+}
+
+.summaryItem {
+  text-align: center;
+}
+
+.summaryLabel {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.summaryValue {
+  font-size: 18px;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.summaryValueHighlight {
+  color: #1677ff;
+}
+
+.summaryDivider {
+  width: 1px;
+  height: 40px;
+  background: #e8e8e8;
+}
+
+.welfareGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.welfareButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 999px;
+  background: #fff;
+  color: rgba(0, 0, 0, 0.65);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.welfareButton:hover {
+  border-color: #1677ff;
+  color: #1677ff;
+}
+
+.welfareButtonActive {
+  border-color: #1677ff;
+  background: #e6f4ff;
+  color: #1677ff;
+}
+
+.recruitOption {
+  padding: 14px 16px;
+  border: 1px solid #f0f0f0;
+  border-radius: 10px;
+  background: #fafafa;
+}
+
+.reviewSummary {
+  padding: 18px;
+  border-radius: 10px;
+  background: #fafafa;
+}
+
+.reviewCategory {
+  display: inline-block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.reviewName {
+  margin: 0 0 12px !important;
+  font-size: 22px !important;
+  font-weight: 700 !important;
+}
+
+.reviewMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.reviewStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.reviewStatCard {
+  padding: 14px;
+  border: 1px solid #f0f0f0;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.reviewStatLabel {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.reviewStatValue {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.reviewStatValueBlue {
+  color: #1677ff;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 28px 24px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.footerRight {
+  margin-left: auto;
+}
+
+@media (max-width: 640px) {
+  .header,
+  .stepsWrap,
+  .body,
+  .footer {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .row,
+  .reviewStats {
+    grid-template-columns: 1fr;
+  }
+
+  .summaryBox {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .summaryDivider {
+    display: none;
+  }
+
+  .positionRow {
+    grid-template-columns: 1fr 72px 36px;
+  }
+}

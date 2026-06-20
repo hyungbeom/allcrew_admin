@@ -12,7 +12,8 @@ import {
   RightOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-import { getGroupKeyByPath, navGroups } from "@/config/navigation";
+import { getGroupKeyByPath, buildNavGroups } from "@/config/navigation";
+import { useCompanySlug } from "@/components/layout/CompanySlugProvider";
 import { HEADER_HEIGHT, SIDER_COLLAPSED_WIDTH, SIDER_WIDTH } from "@/config/layout";
 import { useLayout } from "@/components/layout/LayoutContext";
 import styles from "./Sidebar.module.css";
@@ -29,12 +30,13 @@ const groupIcons: Record<string, React.ReactNode> = {
 export default function Sidebar() {
   const router = useRouter();
   const pathname = usePathname();
+  const companySlug = useCompanySlug();
   const { collapsed, toggleCollapsed } = useLayout();
   const [openKeys, setOpenKeys] = useState<string[]>(["operation"]);
 
   const menuItems: MenuProps["items"] = useMemo(
     () =>
-      navGroups.map((group) => ({
+      buildNavGroups(companySlug).map((group) => ({
         key: group.key,
         icon: groupIcons[group.key],
         label: group.label,
@@ -50,7 +52,7 @@ export default function Sidebar() {
           ),
         })),
       })),
-    [],
+    [companySlug],
   );
 
   useEffect(() => {

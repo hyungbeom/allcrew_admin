@@ -10,13 +10,13 @@ import {
   SendOutlined,
   StopOutlined,
 } from "@ant-design/icons";
-import { Avatar, Button, Card, Input, Select, Space, Table, Typography } from "antd";
+import { App, Avatar, Button, Card, Input, Select, Space, Table, Typography } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { useMemo, useState } from "react";
-import { projectFilterOptions } from "@/components/crew-db/crewData";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useProjectFilterOptions } from "@/hooks/useProjectFilterOptions";
+import { ApiError } from "@/lib/api/client";
+import { fetchContracts } from "@/lib/api/operations";
 import {
-  contractStats,
-  contracts,
   getContractStatusCounts,
   statusLabel,
   type Contract,
@@ -46,11 +46,35 @@ function StatusDot({ status }: { status: ContractStatus }) {
 }
 
 export default function ContractPage() {
+  const { message } = App.useApp();
+  const { options: projectFilterOptions } = useProjectFilterOptions();
   const [projectFilter, setProjectFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState<ContractStatusFilter>("all");
   const [searchText, setSearchText] = useState("");
+  const [contracts, setContracts] = useState<Contract[]>([]);
+  const [contractStats, setContractStats] = useState({ total: 0, signed: 0, pending: 0, unsigned: 0 });
+  const [loading, setLoading] = useState(true);
 
-  const statusCounts = useMemo(() => getContractStatusCounts(contracts), []);
+  const loadContracts = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetchContracts();
+      setContracts(response.items);
+      setContractStats(response.stats);
+    } catch (error) {
+      const errorMessage =
+        error instanceof ApiError ? error.message : "계약 목록을 불러오지 못했습니다.";
+      message.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, [message]);
+
+  useEffect(() => {
+    void loadContracts();
+  }, [loadContracts]);
+
+  const statusCounts = useMemo(() => getContractStatusCounts(contracts), [contracts]);
 
   const filteredContracts = useMemo(() => {
     const keyword = searchText.trim().toLowerCase();
@@ -65,7 +89,7 @@ export default function ContractPage() {
         item.projectName.toLowerCase().includes(keyword)
       );
     });
-  }, [projectFilter, searchText, statusFilter]);
+  }, [contracts, projectFilter, searchText, statusFilter]);
 
   const columns: ColumnsType<Contract> = [
     {
@@ -234,6 +258,7 @@ export default function ContractPage() {
           rowKey="id"
           columns={columns}
           dataSource={filteredContracts}
+          loading={loading}
           pagination={false}
           scroll={{ x: 960 }}
         />

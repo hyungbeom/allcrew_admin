@@ -257,6 +257,126 @@
   min-height: 260px;
 }
 
+.bottomPanelBodyFilled {
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.todayPanelLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  color: #1677ff;
+}
+
+.todayPanelLink:hover {
+  color: #4096ff;
+}
+
+.todayProjectList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  width: 100%;
+}
+
+.todayProjectCardLink {
+  flex: 1 1 280px;
+  max-width: calc(50% - 8px);
+  min-width: 280px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.todayProjectCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  padding: 20px;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.todayProjectCardLink:hover .todayProjectCard {
+  border-color: #d9d9d9;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.todayProjectStatus {
+  align-self: flex-start;
+  margin: 0;
+  padding: 2px 10px;
+  border: none;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.todayProjectStatusDot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: #1677ff;
+  vertical-align: middle;
+}
+
+.todayProjectName {
+  margin: 0 !important;
+  font-size: 22px !important;
+  line-height: 1.3 !important;
+  font-weight: 600 !important;
+}
+
+.todayProjectLocation {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 14px;
+}
+
+.todayProjectLocation :global(.anticon) {
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.todayProjectProgressRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+.todayProjectProgress {
+  flex: 1;
+  margin: 0;
+  line-height: 1;
+}
+
+.todayProjectProgress :global(.ant-progress-inner) {
+  background: #f0f0f0;
+  border-radius: 100px;
+}
+
+.todayProjectProgress :global(.ant-progress-bg) {
+  border-radius: 100px;
+}
+
+.todayProjectCrewCount {
+  flex-shrink: 0;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+  font-variant-numeric: tabular-nums;
+}
+
 .activityList {
   display: flex;
   flex-direction: column;

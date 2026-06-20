@@ -1,3 +1,5 @@
+import type { Project, ProjectStatus } from "@/components/project/projectData";
+
 export type EventStatus = "completed" | "ongoing" | "scheduled";
 
 export type CalendarEvent = {
@@ -5,6 +7,7 @@ export type CalendarEvent = {
   date: string;
   title: string;
   status: EventStatus;
+  projectId: string;
 };
 
 export const statusLabel: Record<EventStatus, string> = {
@@ -13,48 +16,66 @@ export const statusLabel: Record<EventStatus, string> = {
   scheduled: "예정",
 };
 
-export const calendarEvents: CalendarEvent[] = [
-  { id: "1", date: "2026-06-06", title: "신논현 치맥 페스티벌", status: "ongoing" },
-  { id: "1-2", date: "2026-06-06", title: "현장 브리핑", status: "scheduled" },
-  { id: "2", date: "2026-06-07", title: "신논현 치맥 페스티벌", status: "ongoing" },
-  { id: "2-2", date: "2026-06-07", title: "야간 근무", status: "scheduled" },
-  { id: "3", date: "2026-06-08", title: "신논현 치맥 페스티벌", status: "ongoing" },
-  { id: "3-2", date: "2026-06-08", title: "안전교육", status: "scheduled" },
-  { id: "4", date: "2026-06-09", title: "신논현 치맥 페스티벌", status: "ongoing" },
-  { id: "4-2", date: "2026-06-09", title: "철수 점검", status: "scheduled" },
-  { id: "5", date: "2026-06-10", title: "6/16 test", status: "scheduled" },
-  { id: "5-2", date: "2026-06-10", title: "크루 모집 마감", status: "scheduled" },
-  { id: "6", date: "2026-06-11", title: "6/16 test", status: "scheduled" },
-  { id: "6-2", date: "2026-06-11", title: "장비 반입", status: "ongoing" },
-  { id: "7", date: "2026-06-12", title: "6/16 test", status: "scheduled" },
-  { id: "8", date: "2026-06-12", title: "강남 팝업 스태프", status: "scheduled" },
-  { id: "9", date: "2026-06-12", title: "홍대 야간 행사", status: "ongoing" },
-  { id: "10", date: "2026-06-13", title: "6/16 test", status: "scheduled" },
-  { id: "10-2", date: "2026-06-13", title: "중간 정산", status: "scheduled" },
-  { id: "11", date: "2026-06-14", title: "6/16 test", status: "scheduled" },
-  { id: "11-2", date: "2026-06-14", title: "현장 점검", status: "ongoing" },
-  { id: "12", date: "2026-06-15", title: "6/16 test", status: "scheduled" },
-  { id: "12-2", date: "2026-06-15", title: "세이프넷 점검", status: "scheduled" },
-  { id: "13", date: "2026-06-16", title: "6/16 test", status: "ongoing" },
-  { id: "13-2", date: "2026-06-16", title: "오픈 리허설", status: "ongoing" },
-  { id: "14", date: "2026-06-17", title: "6/16 test", status: "ongoing" },
-  { id: "14-2", date: "2026-06-17", title: "본행사 1일차", status: "ongoing" },
-  { id: "15", date: "2026-06-18", title: "6/16 test", status: "ongoing" },
-  { id: "15-2", date: "2026-06-18", title: "본행사 2일차", status: "ongoing" },
-  { id: "16", date: "2026-06-19", title: "asd", status: "completed" },
-  { id: "16-2", date: "2026-06-19", title: "정산 마감", status: "scheduled" },
-  { id: "16-3", date: "2026-06-19", title: "크루 피드백", status: "scheduled" },
-  { id: "17", date: "2026-06-20", title: "철수", status: "scheduled" },
-  { id: "17-2", date: "2026-06-20", title: "장비 회수", status: "scheduled" },
-];
-
-export function getEventsByDate(dateKey: string) {
-  return calendarEvents.filter((event) => event.date === dateKey);
+function mapProjectStatus(status: ProjectStatus): EventStatus {
+  switch (status) {
+    case "completed":
+      return "completed";
+    case "in_progress":
+      return "ongoing";
+    case "recruiting":
+      return "scheduled";
+  }
 }
 
-export function getEventsInMonth(year: number, month: number) {
+function parseDateKey(value: string): Date | null {
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return null;
+  const [, year, month, day] = match;
+  return new Date(Number(year), Number(month) - 1, Number(day));
+}
+
+function toDateKeyFromDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+/** 프로젝트 기간(start~end)을 날짜별 캘린더 이벤트로 변환 */
+export function buildCalendarEvents(projects: Project[]): CalendarEvent[] {
+  const events: CalendarEvent[] = [];
+
+  for (const project of projects) {
+    const start = parseDateKey(project.fullStartDate ?? project.createdAt);
+    const end = parseDateKey(project.fullEndDate ?? project.fullStartDate ?? project.createdAt);
+    if (!start || !end) continue;
+
+    const cursor = new Date(start);
+    const last = end < start ? start : end;
+
+    while (cursor <= last) {
+      const dateKey = toDateKeyFromDate(cursor);
+      events.push({
+        id: `${project.id}-${dateKey}`,
+        date: dateKey,
+        title: project.name,
+        status: mapProjectStatus(project.status),
+        projectId: project.id,
+      });
+      cursor.setDate(cursor.getDate() + 1);
+    }
+  }
+
+  return events.sort((a, b) => a.date.localeCompare(b.date) || a.title.localeCompare(b.title));
+}
+
+export function getEventsByDate(events: CalendarEvent[], dateKey: string) {
+  return events.filter((event) => event.date === dateKey);
+}
+
+export function getEventsInMonth(events: CalendarEvent[], year: number, month: number) {
   const monthPrefix = `${year}-${String(month).padStart(2, "0")}`;
-  return calendarEvents.filter((event) => event.date.startsWith(monthPrefix));
+  return events.filter((event) => event.date.startsWith(monthPrefix));
 }
 
 export function toDateKey(date: { year: () => number; month: () => number; date: () => number }) {

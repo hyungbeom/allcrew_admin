@@ -9,15 +9,17 @@ import {
   StarFilled,
   TeamOutlined,
 } from "@ant-design/icons";
-import { Avatar, Button, Card, Empty, Segmented, Space, Table, Typography } from "antd";
+import { App, Avatar, Button, Card, Empty, Segmented, Space, Spin, Table, Typography } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCompanySlug } from "@/components/layout/CompanySlugProvider";
+import { companyPath } from "@/lib/companyPaths";
+import { ApiError } from "@/lib/api/client";
+import { fetchStatistics } from "@/lib/api/operations";
 import StatisticsChartsLazy from "./StatisticsChartsLazy";
 import {
   periodOptions,
-  summaryStats,
-  topCrewRows,
   type PeriodKey,
   type TopCrewRow,
 } from "./statisticsData";
@@ -26,7 +28,42 @@ import styles from "./StatisticsPage.module.css";
 const avatarColors = ["#1677ff", "#722ed1", "#13c2c2", "#fa8c16", "#eb2f96"];
 
 export default function StatisticsPage() {
+  const companySlug = useCompanySlug();
+  const { message } = App.useApp();
   const [period, setPeriod] = useState<PeriodKey>("quarter");
+  const [loading, setLoading] = useState(true);
+  const [summaryStats, setSummaryStats] = useState({
+    totalProjects: 0,
+    totalCrew: 0,
+    totalWorkHours: 0,
+    safetyIncidents: 0,
+  });
+  const [topCrewRows, setTopCrewRows] = useState<TopCrewRow[]>([]);
+  const [monthlyProjectData, setMonthlyProjectData] = useState<{ month: string; value: number }[]>([]);
+  const [monthlyCrewData, setMonthlyCrewData] = useState<{ month: string; value: number }[]>([]);
+  const [rangeLabel, setRangeLabel] = useState("");
+
+  const loadStatistics = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchStatistics(period);
+      setSummaryStats(data.summary);
+      setTopCrewRows(data.topCrew);
+      setMonthlyProjectData(data.monthlyProjects);
+      setMonthlyCrewData(data.monthlyCrew);
+      setRangeLabel(data.range);
+    } catch (error) {
+      const errorMessage =
+        error instanceof ApiError ? error.message : "통계 데이터를 불러오지 못했습니다.";
+      message.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, [message, period]);
+
+  useEffect(() => {
+    void loadStatistics();
+  }, [loadStatistics]);
 
   const activePeriod = useMemo(
     () => periodOptions.find((item) => item.key === period) ?? periodOptions[1],
@@ -84,6 +121,7 @@ export default function StatisticsPage() {
   ];
 
   return (
+    <Spin spinning={loading}>
     <div className={styles.page}>
       <div className={styles.pageTop}>
         <Typography.Text className={styles.subtitle}>
@@ -158,16 +196,19 @@ export default function StatisticsPage() {
           options={periodOptions.map((item) => ({ label: item.label, value: item.key }))}
           onChange={(value) => setPeriod(value as PeriodKey)}
         />
-        <Typography.Text className={styles.periodRange}>{activePeriod.range} 기준</Typography.Text>
+        <Typography.Text className={styles.periodRange}>{rangeLabel || activePeriod.range} 기준</Typography.Text>
       </div>
 
-      <StatisticsChartsLazy />
+      <StatisticsChartsLazy
+        monthlyProjectData={monthlyProjectData}
+        monthlyCrewData={monthlyCrewData}
+      />
 
       <div className={styles.bottomRow}>
         <Card className={styles.panelCard} size="small" styles={{ body: { padding: "16px 20px 8px" } }}>
           <div className={styles.panelHeader}>
             <Typography.Text className={styles.panelTitle}>가장 많이 투입된 크루</Typography.Text>
-            <Link href="/crew-db" className={styles.panelLink}>
+            <Link href={companyPath(companySlug, "crew-db")} className={styles.panelLink}>
               크루 DB &gt;
             </Link>
           </div>
@@ -191,5 +232,6 @@ export default function StatisticsPage() {
         </Card>
       </div>
     </div>
+    </Spin>
   );
 }

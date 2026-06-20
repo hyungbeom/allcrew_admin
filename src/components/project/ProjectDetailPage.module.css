@@ -2,6 +2,13 @@
   width: 100%;
 }
 
+.pageLoading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+}
+
 .header {
   margin-bottom: 16px;
 }

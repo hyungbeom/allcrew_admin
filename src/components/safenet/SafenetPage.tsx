@@ -10,13 +10,14 @@ import {
   PhoneOutlined,
   SoundOutlined,
 } from "@ant-design/icons";
-import { Button, Card, Select, Space, Typography } from "antd";
-import { useMemo, useState } from "react";
-import { projectFilterOptions } from "@/components/crew-db/crewData";
+import { App, Button, Card, Select, Space, Typography } from "antd";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useProjectFilterOptions } from "@/hooks/useProjectFilterOptions";
+import { ApiError } from "@/lib/api/client";
+import { fetchSafenetIncidents } from "@/lib/api/operations";
 import {
   getIncidentStatusCounts,
-  incidents,
-  workflowStats,
+  type Incident,
   type IncidentStatusFilter,
 } from "./safenetData";
 import styles from "./SafenetPage.module.css";
@@ -28,11 +29,41 @@ const statusFilters: { key: IncidentStatusFilter; label: string }[] = [
 ];
 
 export default function SafenetPage() {
+  const { message } = App.useApp();
+  const { options: projectFilterOptions } = useProjectFilterOptions();
   const [projectFilter, setProjectFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState<IncidentStatusFilter>("all");
-  const [selectedId, setSelectedId] = useState(incidents[0]?.id ?? null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [incidents, setIncidents] = useState<Incident[]>([]);
+  const [workflowStats, setWorkflowStats] = useState({
+    received: 0,
+    redAlert: 0,
+    pttResponse: 0,
+    closed: 0,
+  });
+  const [loading, setLoading] = useState(true);
 
-  const statusCounts = useMemo(() => getIncidentStatusCounts(incidents), []);
+  const loadIncidents = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetchSafenetIncidents();
+      setIncidents(response.items);
+      setWorkflowStats(response.workflowStats);
+      setSelectedId((prev) => prev ?? response.items[0]?.id ?? null);
+    } catch (error) {
+      const errorMessage =
+        error instanceof ApiError ? error.message : "세이프넷 데이터를 불러오지 못했습니다.";
+      message.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, [message]);
+
+  useEffect(() => {
+    void loadIncidents();
+  }, [loadIncidents]);
+
+  const statusCounts = useMemo(() => getIncidentStatusCounts(incidents), [incidents]);
 
   const filteredIncidents = useMemo(() => {
     return incidents.filter((item) => {
@@ -40,7 +71,7 @@ export default function SafenetPage() {
       if (statusFilter !== "all" && item.status !== statusFilter) return false;
       return true;
     });
-  }, [projectFilter, statusFilter]);
+  }, [incidents, projectFilter, statusFilter]);
 
   return (
     <div className={styles.page}>

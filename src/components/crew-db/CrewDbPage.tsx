@@ -9,25 +9,48 @@ import {
   SortAscendingOutlined,
   StarFilled,
 } from "@ant-design/icons";
-import { Avatar, Button, Card, Input, Select, Table, Tag, Typography, message } from "antd";
+import { App, Avatar, Button, Card, Input, Select, Table, Tag, Typography } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   avatarColors,
-  crewMembers,
   formatRecentWork,
   maskPhone,
-  projectFilterOptions,
   type CrewMember,
 } from "./crewData";
+import { useProjectFilterOptions } from "@/hooks/useProjectFilterOptions";
+import { ApiError } from "@/lib/api/client";
+import { fetchCrewMembers } from "@/lib/api/operations";
 import styles from "./CrewDbPage.module.css";
 
 const PAGE_SIZE = 10;
 
 export default function CrewDbPage() {
+  const { message } = App.useApp();
+  const { options: projectFilterOptions } = useProjectFilterOptions();
   const [projectFilter, setProjectFilter] = useState("all");
   const [searchText, setSearchText] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [crewMembers, setCrewMembers] = useState<CrewMember[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadCrew = useCallback(async () => {
+    setLoading(true);
+    try {
+      const items = await fetchCrewMembers();
+      setCrewMembers(items);
+    } catch (error) {
+      const errorMessage =
+        error instanceof ApiError ? error.message : "크루 목록을 불러오지 못했습니다.";
+      message.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, [message]);
+
+  useEffect(() => {
+    void loadCrew();
+  }, [loadCrew]);
 
   const filteredCrew = useMemo(() => {
     const keyword = searchText.trim().toLowerCase();
@@ -48,7 +71,7 @@ export default function CrewDbPage() {
         );
       })
       .sort((a, b) => b.workDays - a.workDays);
-  }, [projectFilter, searchText]);
+  }, [crewMembers, projectFilter, searchText]);
 
   const columns: ColumnsType<CrewMember> = [
     {
@@ -73,7 +96,7 @@ export default function CrewDbPage() {
       key: "role",
       width: 100,
       render: (value: string) => (
-        <Tag bordered={false} className={styles.roleTag}>
+        <Tag variant="filled" className={styles.roleTag}>
           {value}
         </Tag>
       ),
@@ -180,6 +203,7 @@ export default function CrewDbPage() {
           rowKey="id"
           columns={columns}
           dataSource={filteredCrew}
+          loading={loading}
           scroll={{ x: 960 }}
           pagination={{
             current: currentPage,

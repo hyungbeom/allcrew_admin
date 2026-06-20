@@ -1,20 +1,21 @@
-.formSide {
+.page {
   display: flex;
-  flex: 1 1 50%;
-  align-items: flex-start;
   justify-content: center;
-  min-width: 0;
+  width: 100%;
   min-height: 100vh;
-  padding: 40px clamp(24px, 5vw, 64px);
+  padding: 48px 24px 64px;
   overflow-y: auto;
-  background: #f5f5f5;
+  background: #fff;
 }
 
-.signupCard {
-  width: min(100%, 640px);
-  margin: auto 0;
-  border-radius: 12px !important;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06) !important;
+.pageInner {
+  width: 100%;
+  max-width: 640px;
+}
+
+.header {
+  margin-bottom: 32px;
+  text-align: center;
 }
 
 .logo {
@@ -26,20 +27,28 @@
 }
 
 .pageSubtitle {
-  display: block;
-  margin-bottom: 28px;
   font-size: 14px;
 }
 
 .steps {
-  margin-bottom: 32px;
+  width: 100%;
+  margin-bottom: 40px;
+}
+
+.steps :global(.ant-steps) {
+  width: 100%;
+}
+
+.stepForm {
+  width: 100%;
 }
 
 .stepTitle {
   display: block;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   font-size: 16px;
   font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
 }
 
 .typeList {
@@ -57,7 +66,7 @@
   text-align: left;
   background: #fff;
   border: 1px solid #d9d9d9;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
   transition: border-color 0.2s, background 0.2s;
 }
@@ -81,7 +90,7 @@
   font-size: 22px;
   color: #1677ff;
   background: #f0f5ff;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .typeText {
@@ -153,29 +162,54 @@
   font-size: 12px;
 }
 
-.navRow {
+.stepActions {
   display: flex;
+  justify-content: center;
   gap: 12px;
-  margin-top: 8px;
+  margin-top: 32px;
 }
 
-.navRow :global(.ant-btn) {
-  flex: 1;
-  height: 44px;
+.stepActions :global(.ant-btn-primary) {
+  min-width: 120px;
 }
 
 .loginHint {
   display: block;
-  margin-top: 20px;
+  width: 100%;
+  margin-top: 24px;
   font-size: 14px;
   text-align: center;
 }
 
+.divider {
+  width: 100%;
+  margin: 48px 0 32px !important;
+}
+
+.description {
+  width: 100%;
+}
+
+.descriptionTitle {
+  margin: 0 0 16px !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+}
+
+.descriptionList {
+  margin: 0;
+  padding-left: 20px;
+  color: rgba(0, 0, 0, 0.65);
+  font-size: 14px;
+  line-height: 2;
+}
+
 .crewBox {
-  margin-top: 24px;
+  width: 100%;
+  margin-top: 32px;
   padding: 20px;
   background: #fafafa;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .crewTitle {
@@ -216,10 +250,12 @@
   background: #262626 !important;
 }
 
-@media (max-width: 992px) {
-  .formSide {
-    flex: none;
-    min-height: auto;
+@media (max-width: 768px) {
+  .page {
     padding: 24px 16px 40px;
+  }
+
+  .steps :global(.ant-steps-item-title) {
+    font-size: 12px !important;
   }
 }

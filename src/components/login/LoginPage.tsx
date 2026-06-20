@@ -2,8 +2,12 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button, Divider, Form, Input, Typography } from "antd";
-import { MailOutlined } from "@ant-design/icons";
+import { useEffect, useState } from "react";
+import { App, Button, Divider, Form, Input, Typography } from "antd";
+import { LockOutlined, MailOutlined } from "@ant-design/icons";
+import { clearAuthSession, getAccessToken, getStoredMember, login } from "@/lib/api/auth";
+import { companyPath } from "@/lib/companyPaths";
+import { ApiError } from "@/lib/api/client";
 import styles from "./LoginPage.module.css";
 
 function BrandIcon() {
@@ -64,15 +68,43 @@ function FacebookIcon() {
 
 type LoginFormValues = {
   email: string;
+  password: string;
 };
 
 export default function LoginPage() {
   const router = useRouter();
+  const { message } = App.useApp();
   const [form] = Form.useForm<LoginFormValues>();
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (values: LoginFormValues) => {
-    void values;
-    router.push("/dashboard");
+  useEffect(() => {
+    const hasToken = document.cookie.includes("allcrew_token=");
+    const hasSlug = document.cookie.includes("allcrew_company_slug=");
+    const member = getStoredMember();
+
+    if ((hasToken || getAccessToken()) && !hasSlug && !member?.companySlug) {
+      clearAuthSession();
+    }
+  }, []);
+
+  const handleSubmit = async (values: LoginFormValues) => {
+    setSubmitting(true);
+    try {
+      const auth = await login(values.email.trim(), values.password);
+      message.success("로그인되었습니다.");
+      const slug = auth.member.companySlug;
+      if (!slug) {
+        message.error("업체 정보를 불러올 수 없습니다. 관리자에게 문의해 주세요.");
+        return;
+      }
+      router.push(companyPath(slug, "dashboard"));
+    } catch (error) {
+      const errorMessage =
+        error instanceof ApiError ? error.message : "로그인에 실패했습니다.";
+      message.error(errorMessage);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -115,7 +147,7 @@ export default function LoginPage() {
             layout="vertical"
             requiredMark={false}
             className={styles.form}
-            initialValues={{ email: "" }}
+            initialValues={{ email: "", password: "" }}
             onFinish={handleSubmit}
           >
             <Form.Item
@@ -133,8 +165,20 @@ export default function LoginPage() {
               />
             </Form.Item>
 
+            <Form.Item
+              name="password"
+              rules={[{ required: true, message: "비밀번호를 입력해 주세요." }]}
+            >
+              <Input.Password
+                className={styles.emailInput}
+                size="large"
+                placeholder="비밀번호 입력"
+                prefix={<LockOutlined className={styles.inputIcon} />}
+              />
+            </Form.Item>
+
             <div className={styles.actionRow}>
-              <Button type="primary" htmlType="submit" className={styles.primaryButton}>
+              <Button type="primary" htmlType="submit" className={styles.primaryButton} loading={submitting}>
                 로그인
               </Button>
               <Link href="/signup" className={styles.signupLink}>

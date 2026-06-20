@@ -139,6 +139,14 @@
   color: rgba(255, 255, 255, 0.35) !important;
 }
 
+.emailInput :global(.ant-input-password-icon) {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+.emailInput :global(.ant-input-password-icon:hover) {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
 .inputIcon {
   margin-right: 4px;
   font-size: 16px;

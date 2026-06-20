@@ -22,6 +22,15 @@ export type Project = {
   avgHourlyWage?: number;
   accumulatedCost?: number;
   applicantCount?: number;
+  gpsRadius?: number;
+  breakMinutes?: number;
+  welfare?: string[];
+  positions?: {
+    name: string;
+    count: number;
+    payType: string;
+    amount: number;
+  }[];
   fieldAttendance?: {
     normal: number;
     late: number;

@@ -10,23 +10,23 @@ import {
   PayCircleOutlined,
   WalletOutlined,
 } from "@ant-design/icons";
-import { Avatar, Button, Card, Empty, Select, Space, Table, Typography } from "antd";
+import { App, Avatar, Button, Card, Empty, Select, Space, Table, Typography } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useProjectFilterOptions } from "@/hooks/useProjectFilterOptions";
+import { ApiError } from "@/lib/api/client";
+import { fetchSettlements } from "@/lib/api/operations";
 import {
   formatCurrency,
   formatWorkHours,
   getSettlementStatusCounts,
   getSettlementSummary,
-  settlements,
   statusLabel,
   type Settlement,
   type SettlementStatus,
   type SettlementStatusFilter,
 } from "./settlementData";
 import styles from "./SettlementPage.module.css";
-
-const projectOptions = [{ value: "PRJ-0012", label: "asd" }];
 
 const statusFilters: { key: SettlementStatusFilter; label: string }[] = [
   { key: "all", label: "전체" },
@@ -49,12 +49,40 @@ function StatusDot({ status }: { status: SettlementStatus }) {
 }
 
 export default function SettlementPage() {
-  const [projectFilter, setProjectFilter] = useState("PRJ-0012");
+  const { message } = App.useApp();
+  const { options: projectOptions, loading: optionsLoading } = useProjectFilterOptions(false);
+  const [projectFilter, setProjectFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState<SettlementStatusFilter>("pending");
+  const [settlements, setSettlements] = useState<Settlement[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadSettlements = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetchSettlements();
+      setSettlements(response.items);
+    } catch (error) {
+      const errorMessage =
+        error instanceof ApiError ? error.message : "정산 목록을 불러오지 못했습니다.";
+      message.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, [message]);
+
+  useEffect(() => {
+    void loadSettlements();
+  }, [loadSettlements]);
+
+  useEffect(() => {
+    if (!projectFilter && projectOptions.length > 0) {
+      setProjectFilter(projectOptions[0].value);
+    }
+  }, [projectFilter, projectOptions]);
 
   const projectSettlements = useMemo(
     () => settlements.filter((item) => item.projectId === projectFilter),
-    [projectFilter],
+    [projectFilter, settlements],
   );
 
   const statusCounts = useMemo(
@@ -209,8 +237,9 @@ export default function SettlementPage() {
         <div className={styles.toolbarLeft}>
           <Select
             className={styles.projectSelect}
-            value={projectFilter}
+            value={projectFilter || undefined}
             options={projectOptions}
+            loading={optionsLoading}
             prefix={<FolderOutlined style={{ color: "rgba(0,0,0,0.45)" }} />}
             onChange={setProjectFilter}
           />
@@ -242,6 +271,7 @@ export default function SettlementPage() {
           rowKey="id"
           columns={columns}
           dataSource={filteredSettlements}
+          loading={loading}
           pagination={false}
           scroll={{ x: 960 }}
           locale={{

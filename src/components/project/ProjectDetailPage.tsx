@@ -12,6 +12,7 @@ import {
   WalletOutlined,
 } from "@ant-design/icons";
 import {
+  App,
   Avatar,
   Button,
   Card,
@@ -23,12 +24,17 @@ import {
   Segmented,
   Select,
   Space,
+  Spin,
   Tabs,
   Tag,
   Typography,
 } from "antd";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCompanySlug } from "@/components/layout/CompanySlugProvider";
+import { companyPath } from "@/lib/companyPaths";
+import { fetchProject } from "@/lib/api/project";
+import { ApiError } from "@/lib/api/client";
 import { SummaryStatsRow } from "./ProjectDetailSummary";
 import {
   ContractTab,
@@ -45,7 +51,6 @@ import {
   formatBudget,
   getApplicantStatusCounts,
   getProjectApplicants,
-  getProjectById,
   getProjectCrewMembers,
   getProjectPlacements,
   getProjectPeriod,
@@ -296,8 +301,8 @@ function OverviewTab({ project }: { project: Project }) {
               <>
                 <div className={styles.mapPlaceholder}>Kakao Map · 현장 위치</div>
                 <div className={styles.mapOverlay}>
-                  <Tag>현장 크루 0명</Tag>
-                  <Tag>GPS 반경 100m</Tag>
+                  <Tag>현장 크루 {project.crewCurrent}명</Tag>
+                  <Tag>GPS 반경 {project.gpsRadius ?? 100}m</Tag>
                 </div>
               </>
             ) : (
@@ -313,8 +318,36 @@ function OverviewTab({ project }: { project: Project }) {
 }
 
 export default function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
-  const project = getProjectById(projectId);
+  const companySlug = useCompanySlug();
+  const { message } = App.useApp();
+  const [project, setProject] = useState<Project | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
   const [activeTab, setActiveTab] = useState<DetailTabKey>("overview");
+
+  const loadProject = useCallback(async () => {
+    setLoading(true);
+    setNotFound(false);
+    try {
+      const data = await fetchProject(projectId);
+      setProject(data);
+    } catch (error) {
+      setProject(null);
+      if (error instanceof ApiError && error.status === 404) {
+        setNotFound(true);
+        return;
+      }
+      const errorMessage =
+        error instanceof ApiError ? error.message : "프로젝트 정보를 불러오지 못했습니다.";
+      message.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, [message, projectId]);
+
+  useEffect(() => {
+    void loadProject();
+  }, [loadProject]);
 
   const tabItems = useMemo(() => {
     if (!project) return [];
@@ -338,10 +371,18 @@ export default function ProjectDetailPage({ projectId }: ProjectDetailPageProps)
     ];
   }, [project]);
 
-  if (!project) {
+  if (loading) {
+    return (
+      <div className={styles.pageLoading}>
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (!project || notFound) {
     return (
       <Empty description="프로젝트를 찾을 수 없습니다.">
-        <Link href="/project">
+        <Link href={companyPath(companySlug, "project")}>
           <Button type="primary">프로젝트 목록으로</Button>
         </Link>
       </Empty>

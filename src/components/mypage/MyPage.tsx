@@ -1,45 +1,42 @@
 "use client";
 
 import {
-  BankOutlined,
   BellOutlined,
-  CheckOutlined,
   CreditCardOutlined,
   EnvironmentOutlined,
+  LinkOutlined,
+  SafetyOutlined,
+  SettingOutlined,
   ThunderboltOutlined,
   UploadOutlined,
   UserAddOutlined,
-  TeamOutlined,
 } from "@ant-design/icons";
 import {
+  App,
+  Avatar,
   Button,
-  Card,
+  Col,
   Empty,
   Form,
   Input,
+  Menu,
+  Row,
   Space,
   Switch,
   Table,
   Typography,
   Upload,
-  message,
 } from "antd";
-import type { UploadProps } from "antd";
-import { useState, type ReactNode } from "react";
+import type { MenuProps, UploadProps } from "antd";
+import { useMemo, useState } from "react";
 import { openDaumPostcode } from "@/lib/daumPostcode";
 import styles from "./MyPage.module.css";
 
-const LOGO_PATH = "/logo.svg";
+const AVATAR_URL =
+  "https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png";
 const MAX_LOGO_SIZE_MB = 2;
 
-type MenuKey = "company" | "team" | "notifications" | "billing";
-
-const menuItems: { key: MenuKey; label: string; icon: ReactNode }[] = [
-  { key: "company", label: "회사 정보", icon: <BankOutlined /> },
-  { key: "team", label: "팀원 · 권한", icon: <TeamOutlined /> },
-  { key: "notifications", label: "알림", icon: <BellOutlined /> },
-  { key: "billing", label: "요금제 · 결제", icon: <CreditCardOutlined /> },
-];
+type MenuKey = "basic" | "security" | "binding" | "notifications" | "billing";
 
 const notificationSettings = [
   {
@@ -68,9 +65,18 @@ const notificationSettings = [
   },
 ];
 
-function CompanyInfoSection() {
+const menuLabels: Record<MenuKey, string> = {
+  basic: "기본 설정",
+  security: "보안 설정",
+  binding: "계정 연동",
+  notifications: "새 메시지 알림",
+  billing: "요금제 · 결제",
+};
+
+function BasicSettingsSection() {
+  const { message } = App.useApp();
   const [form] = Form.useForm();
-  const [logoUrl, setLogoUrl] = useState(LOGO_PATH);
+  const [avatarUrl, setAvatarUrl] = useState(AVATAR_URL);
 
   const uploadProps: UploadProps = {
     accept: ".png,.svg,.jpg,.jpeg",
@@ -86,11 +92,11 @@ function CompanyInfoSection() {
       }
 
       if (!isLt2M) {
-        message.error(`로고는 ${MAX_LOGO_SIZE_MB}MB 이하만 업로드할 수 있습니다.`);
+        message.error(`이미지는 ${MAX_LOGO_SIZE_MB}MB 이하만 업로드할 수 있습니다.`);
         return Upload.LIST_IGNORE;
       }
 
-      setLogoUrl(URL.createObjectURL(file));
+      setAvatarUrl(URL.createObjectURL(file));
       return false;
     },
   };
@@ -103,101 +109,171 @@ function CompanyInfoSection() {
 
   return (
     <>
-      <Typography.Title level={4} className={styles.sectionTitle}>
-        회사 정보
+      <Typography.Title level={3} className={styles.contentTitle}>
+        기본 설정
       </Typography.Title>
 
-      <div className={styles.logoSection}>
-        <div className={styles.logoPreview}>
-          <img src={logoUrl} alt="회사 로고" className={styles.logoImage} />
-        </div>
-        <div className={styles.logoActions}>
-          <Upload {...uploadProps}>
-            <Button icon={<UploadOutlined />}>로고 변경</Button>
-          </Upload>
-          <Typography.Text className={styles.logoHint}>PNG · SVG, 최대 2MB</Typography.Text>
-        </div>
-      </div>
+      <Row gutter={[48, 24]}>
+        <Col xs={24} lg={14} xl={13}>
+          <Form
+            form={form}
+            layout="vertical"
+            className={styles.settingsForm}
+            initialValues={{
+              email: "admin@allcrew.com",
+              managerName: "김대표",
+              companyIntro: "",
+              companyName: "올크루 주식회사",
+              businessNumber: "4079903458",
+              address: "경기 고양시 덕양구 청초로 10",
+              addressDetail: "1513호",
+              phonePrefix: "010",
+              phone: "06311031",
+            }}
+            onFinish={() => message.success("기본 정보가 저장되었습니다.")}
+          >
+            <Form.Item
+              label="이메일"
+              name="email"
+              rules={[
+                { required: true, message: "이메일을 입력해 주세요." },
+                { type: "email", message: "올바른 이메일 형식이 아닙니다." },
+              ]}
+            >
+              <Input allowClear />
+            </Form.Item>
+            <Form.Item label="담당자명" name="managerName" rules={[{ required: true }]}>
+              <Input allowClear />
+            </Form.Item>
+            <Form.Item label="회사 소개" name="companyIntro">
+              <Input.TextArea rows={4} placeholder="회사 소개" />
+            </Form.Item>
+            <Form.Item label="회사명" name="companyName" rules={[{ required: true }]}>
+              <Input allowClear />
+            </Form.Item>
+            <Form.Item label="사업자등록번호" name="businessNumber" rules={[{ required: true }]}>
+              <Input allowClear />
+            </Form.Item>
+            <Form.Item label="주소">
+              <Space.Compact className={styles.addressCompact}>
+                <Form.Item name="address" noStyle>
+                  <Input
+                    readOnly
+                    placeholder="주소 검색"
+                    prefix={<EnvironmentOutlined style={{ color: "rgba(0,0,0,0.25)" }} />}
+                  />
+                </Form.Item>
+                <Button onClick={handleAddressSearch}>주소 검색</Button>
+              </Space.Compact>
+            </Form.Item>
+            <Form.Item label="상세 주소" name="addressDetail">
+              <Input allowClear placeholder="상세 주소" />
+            </Form.Item>
+            <Form.Item label="연락처">
+              <Space.Compact className={styles.phoneCompact}>
+                <Form.Item name="phonePrefix" noStyle>
+                  <Input style={{ width: 88 }} allowClear />
+                </Form.Item>
+                <Form.Item name="phone" noStyle rules={[{ required: true }]}>
+                  <Input allowClear placeholder="전화번호" />
+                </Form.Item>
+              </Space.Compact>
+            </Form.Item>
+            <Form.Item className={styles.submitItem}>
+              <Button type="primary" htmlType="submit">
+                기본 정보 업데이트
+              </Button>
+            </Form.Item>
+          </Form>
+        </Col>
+
+        <Col xs={24} lg={10} xl={8}>
+          <div className={styles.avatarSection}>
+            <Typography.Text className={styles.avatarLabel}>아바타</Typography.Text>
+            <Avatar size={104} src={avatarUrl} className={styles.avatar} />
+            <Upload {...uploadProps}>
+              <Button icon={<UploadOutlined />}>아바타 변경</Button>
+            </Upload>
+          </div>
+        </Col>
+      </Row>
+    </>
+  );
+}
+
+function SecuritySettingsSection() {
+  const { message } = App.useApp();
+  const [form] = Form.useForm();
+
+  return (
+    <>
+      <Typography.Title level={3} className={styles.contentTitle}>
+        보안 설정
+      </Typography.Title>
 
       <Form
         form={form}
         layout="vertical"
-        initialValues={{
-          companyName: "올크루 주식회사",
-          businessNumber: "4079903458",
-          representative: "김대표",
-          address: "경기 고양시 덕양구 청초로 10",
-          addressDetail: "1513호",
-          phone: "01006311031",
-        }}
-        onFinish={() => message.success("회사 정보가 저장되었습니다.")}
+        className={styles.settingsForm}
+        onFinish={() => message.success("비밀번호가 변경되었습니다.")}
       >
-        <div className={styles.formGrid}>
-          <Form.Item label="회사명" name="companyName" className={styles.formGridFull}>
-            <Input />
-          </Form.Item>
-          <Form.Item label="사업자등록번호" name="businessNumber">
-            <Input />
-          </Form.Item>
-          <Form.Item label="대표자명" name="representative">
-            <Input />
-          </Form.Item>
-          <Form.Item label="주소" className={styles.formGridFull}>
-            <Space.Compact className={styles.addressCompact}>
-              <Form.Item name="address" noStyle>
-                <Input
-                  readOnly
-                  placeholder="주소 찾기 버튼으로 검색하세요"
-                  prefix={<EnvironmentOutlined style={{ color: "rgba(0,0,0,0.25)" }} />}
-                />
-              </Form.Item>
-              <Button type="default" onClick={handleAddressSearch}>
-                주소 찾기
-              </Button>
-            </Space.Compact>
-          </Form.Item>
-          <Form.Item label="상세 주소" name="addressDetail" className={styles.formGridFull}>
-            <Input placeholder="상세 주소를 입력하세요" />
-          </Form.Item>
-          <Form.Item label="대표 전화" name="phone" className={styles.formGridFull}>
-            <Input />
-          </Form.Item>
-        </div>
-
-        <div className={styles.formActions}>
-          <Button type="primary" htmlType="submit" icon={<CheckOutlined />}>
-            저장
+        <Form.Item
+          label="현재 비밀번호"
+          name="currentPassword"
+          rules={[{ required: true, message: "현재 비밀번호를 입력해 주세요." }]}
+        >
+          <Input.Password />
+        </Form.Item>
+        <Form.Item
+          label="새 비밀번호"
+          name="newPassword"
+          rules={[{ required: true, message: "새 비밀번호를 입력해 주세요." }]}
+        >
+          <Input.Password />
+        </Form.Item>
+        <Form.Item
+          label="새 비밀번호 확인"
+          name="confirmPassword"
+          dependencies={["newPassword"]}
+          rules={[
+            { required: true, message: "새 비밀번호 확인을 입력해 주세요." },
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                if (!value || getFieldValue("newPassword") === value) {
+                  return Promise.resolve();
+                }
+                return Promise.reject(new Error("비밀번호가 일치하지 않습니다."));
+              },
+            }),
+          ]}
+        >
+          <Input.Password />
+        </Form.Item>
+        <Form.Item className={styles.submitItem}>
+          <Button type="primary" htmlType="submit">
+            비밀번호 변경
           </Button>
-          <Button
-            onClick={() => {
-              form.resetFields();
-              setLogoUrl(LOGO_PATH);
-            }}
-          >
-            취소
-          </Button>
-        </div>
+        </Form.Item>
       </Form>
     </>
   );
 }
 
-function TeamSection() {
+function BindingSection() {
   return (
     <>
       <div className={styles.sectionHeader}>
-        <Typography.Title level={4} className={styles.sectionTitle}>
-          팀원 · 권한
+        <Typography.Title level={3} className={styles.contentTitle}>
+          계정 연동
         </Typography.Title>
-        <Button type="primary" size="small" icon={<UserAddOutlined />}>
+        <Button type="primary" icon={<UserAddOutlined />}>
           팀원 초대
         </Button>
       </div>
 
       <Table
         className={styles.teamTable}
-        size="small"
-        bordered
+        size="middle"
         columns={[
           { title: "팀원", dataIndex: "member", key: "member" },
           { title: "역할", dataIndex: "role", key: "role" },
@@ -210,7 +286,7 @@ function TeamSection() {
             <div className={styles.emptyWrap}>
               <Empty
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description="아직 팀원이 없어요. '팀원 초대'로 초대 코드를 발급하세요."
+                description="아직 연동된 팀원이 없어요. '팀원 초대'로 초대 코드를 발급하세요."
               />
             </div>
           ),
@@ -223,8 +299,8 @@ function TeamSection() {
 function NotificationsSection() {
   return (
     <>
-      <Typography.Title level={4} className={styles.sectionTitle}>
-        알림
+      <Typography.Title level={3} className={styles.contentTitle}>
+        새 메시지 알림
       </Typography.Title>
 
       <div className={styles.notificationList}>
@@ -234,7 +310,7 @@ function NotificationsSection() {
               <Typography.Text className={styles.notificationTitle}>{item.title}</Typography.Text>
               <Typography.Text className={styles.notificationDesc}>{item.description}</Typography.Text>
             </div>
-            <Switch size="small" defaultChecked={item.defaultChecked} />
+            <Switch defaultChecked={item.defaultChecked} />
           </div>
         ))}
       </div>
@@ -245,7 +321,7 @@ function NotificationsSection() {
 function BillingSection() {
   return (
     <>
-      <Typography.Title level={4} className={styles.sectionTitle}>
+      <Typography.Title level={3} className={styles.contentTitle}>
         요금제 · 결제
       </Typography.Title>
 
@@ -282,14 +358,27 @@ function BillingSection() {
 }
 
 export default function MyPage() {
-  const [activeMenu, setActiveMenu] = useState<MenuKey>("company");
+  const [activeMenu, setActiveMenu] = useState<MenuKey>("basic");
+
+  const menuItems: MenuProps["items"] = useMemo(
+    () => [
+      { key: "basic", icon: <SettingOutlined />, label: menuLabels.basic },
+      { key: "security", icon: <SafetyOutlined />, label: menuLabels.security },
+      { key: "binding", icon: <LinkOutlined />, label: menuLabels.binding },
+      { key: "notifications", icon: <BellOutlined />, label: menuLabels.notifications },
+      { key: "billing", icon: <CreditCardOutlined />, label: menuLabels.billing },
+    ],
+    [],
+  );
 
   const renderContent = () => {
     switch (activeMenu) {
-      case "company":
-        return <CompanyInfoSection />;
-      case "team":
-        return <TeamSection />;
+      case "basic":
+        return <BasicSettingsSection />;
+      case "security":
+        return <SecuritySettingsSection />;
+      case "binding":
+        return <BindingSection />;
       case "notifications":
         return <NotificationsSection />;
       case "billing":
@@ -301,27 +390,20 @@ export default function MyPage() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.layout}>
-        <Card size="small" className={styles.sidebar} styles={{ body: { padding: 8 } }}>
-          <nav className={styles.sidebarNav}>
-            {menuItems.map((item) => (
-              <button
-                key={item.key}
-                type="button"
-                className={`${styles.menuItem} ${activeMenu === item.key ? styles.menuItemActive : ""}`}
-                onClick={() => setActiveMenu(item.key)}
-              >
-                {item.icon}
-                {item.label}
-              </button>
-            ))}
-          </nav>
-        </Card>
-
-        <Card size="small" className={styles.contentCard} styles={{ body: { padding: "16px 20px 20px" } }}>
-          {renderContent()}
-        </Card>
-      </div>
+      <Row gutter={24} wrap={false} className={styles.layout}>
+        <Col flex="0 0 224px" className={styles.menuCol}>
+          <Menu
+            mode="inline"
+            selectedKeys={[activeMenu]}
+            items={menuItems}
+            className={styles.sideMenu}
+            onClick={({ key }) => setActiveMenu(key as MenuKey)}
+          />
+        </Col>
+        <Col flex="auto" className={styles.contentCol}>
+          <div className={styles.main}>{renderContent()}</div>
+        </Col>
+      </Row>
     </div>
   );
 }

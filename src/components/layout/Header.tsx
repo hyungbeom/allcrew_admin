@@ -2,10 +2,13 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Avatar, Badge, Dropdown, Layout } from "antd";
 import type { MenuProps } from "antd";
 import { BellOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
+import { getStoredMember, logout } from "@/lib/api/auth";
+import { companyPath } from "@/lib/companyPaths";
+import { useCompanySlug } from "@/components/layout/CompanySlugProvider";
 import NotificationDrawer from "./NotificationDrawer";
 import styles from "./Header.module.css";
 
@@ -32,8 +35,17 @@ const userMenuItems: MenuProps["items"] = [
 
 export default function Header() {
   const router = useRouter();
+  const companySlug = useCompanySlug();
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(25);
+  const [userName, setUserName] = useState("사용자");
+
+  useEffect(() => {
+    const member = getStoredMember();
+    if (member?.name) {
+      setUserName(member.name);
+    }
+  }, []);
 
   const handleUnreadCountChange = useCallback((count: number) => {
     setUnreadCount(count);
@@ -41,14 +53,20 @@ export default function Header() {
 
   const handleUserMenuClick: MenuProps["onClick"] = ({ key }) => {
     if (key === "mypage") {
-      router.push("/mypage");
+      router.push(companyPath(companySlug, "mypage"));
+      return;
+    }
+
+    if (key === "logout") {
+      logout();
+      router.push("/login");
     }
   };
 
   return (
     <AntHeader className={styles.header}>
       <div className={styles.left}>
-        <Link href="/dashboard" className={styles.logoLink}>
+        <Link href={companyPath(companySlug, "dashboard")} className={styles.logoLink}>
           <img src="/logo.svg" alt="ALLCREW" className={styles.logoImage} />
         </Link>
       </div>
@@ -87,7 +105,7 @@ export default function Header() {
         >
           <div className={styles.userTrigger}>
             <Avatar size={24} src={AVATAR_URL} />
-            <span className={styles.userName}>ProUser</span>
+            <span className={styles.userName}>{userName}</span>
           </div>
         </Dropdown>
       </div>

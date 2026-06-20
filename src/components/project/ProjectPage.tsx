@@ -7,14 +7,18 @@ import {
   PlusOutlined,
   UnorderedListOutlined,
 } from "@ant-design/icons";
-import { Button, Card, Input, Progress, Space, Table, Tag, message } from "antd";
+import { App, Button, Card, Input, Progress, Space, Table, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import CreateProjectModal from "./CreateProjectModal";
+import { useCompanySlug } from "@/components/layout/CompanySlugProvider";
+import { companyPath } from "@/lib/companyPaths";
+import { fetchProjects } from "@/lib/api/project";
+import { ApiError } from "@/lib/api/client";
 import {
   formatBudget,
   getStatusCounts,
-  projects,
   statusLabel,
   type Project,
   type ProjectStatus,
@@ -39,12 +43,35 @@ const statusTagColor: Record<ProjectStatus, string> = {
 
 export default function ProjectPage() {
   const router = useRouter();
+  const companySlug = useCompanySlug();
+  const { message } = App.useApp();
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [searchText, setSearchText] = useState("");
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const statusCounts = useMemo(() => getStatusCounts(projects), []);
+  const loadProjects = useCallback(async () => {
+    setLoading(true);
+    try {
+      const items = await fetchProjects();
+      setProjects(items);
+    } catch (error) {
+      const errorMessage =
+        error instanceof ApiError ? error.message : "프로젝트 목록을 불러오지 못했습니다.";
+      message.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, [message]);
+
+  useEffect(() => {
+    void loadProjects();
+  }, [loadProjects]);
+
+  const statusCounts = useMemo(() => getStatusCounts(projects), [projects]);
 
   const filteredProjects = useMemo(() => {
     const keyword = searchText.trim().toLowerCase();
@@ -65,10 +92,10 @@ export default function ProjectPage() {
         );
       })
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  }, [searchText, statusFilter]);
+  }, [searchText, statusFilter, projects]);
 
   const handleRowClick = (record: Project) => {
-    router.push(`/project/${record.id}`);
+    router.push(companyPath(companySlug, `project/${record.id}`));
   };
 
   const isSelectionClick = (target: EventTarget) => {
@@ -148,7 +175,7 @@ export default function ProjectPage() {
           <Button icon={<DownloadOutlined />} onClick={() => message.info("CSV 다운로드를 준비 중입니다.")}>
             CSV
           </Button>
-          <Button type="primary" icon={<PlusOutlined />}>
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalOpen(true)}>
             새 프로젝트
           </Button>
         </Space>
@@ -202,6 +229,7 @@ export default function ProjectPage() {
           rowKey="id"
           size="small"
           bordered
+          loading={loading}
           columns={columns}
           dataSource={filteredProjects}
           pagination={false}
@@ -257,6 +285,12 @@ export default function ProjectPage() {
           ))}
         </div>
       )}
+
+      <CreateProjectModal
+        open={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onCreated={loadProjects}
+      />
     </div>
   );
 }

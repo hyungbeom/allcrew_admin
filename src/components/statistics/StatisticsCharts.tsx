@@ -3,10 +3,19 @@
 import { Column } from "@ant-design/charts";
 import { Card, Typography } from "antd";
 import { useMemo } from "react";
-import { monthlyCrewData, monthlyProjectData } from "./statisticsData";
 import styles from "./StatisticsPage.module.css";
 
-export default function StatisticsCharts() {
+type ChartPoint = { month: string; value: number };
+
+type StatisticsChartsProps = {
+  monthlyProjectData: ChartPoint[];
+  monthlyCrewData: ChartPoint[];
+};
+
+export default function StatisticsCharts({
+  monthlyProjectData,
+  monthlyCrewData,
+}: StatisticsChartsProps) {
   const projectChartConfig = useMemo(
     () => ({
       data: monthlyProjectData,
@@ -30,7 +39,7 @@ export default function StatisticsCharts() {
         items: [{ field: "value", name: "프로젝트", valueFormatter: (v: number) => `${v}건` }],
       },
     }),
-    [],
+    [monthlyProjectData],
   );
 
   const crewChartConfig = useMemo(
@@ -56,7 +65,7 @@ export default function StatisticsCharts() {
         items: [{ field: "value", name: "크루", valueFormatter: (v: number) => `${v}명` }],
       },
     }),
-    [],
+    [monthlyCrewData],
   );
 
   return (
