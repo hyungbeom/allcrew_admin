@@ -22,11 +22,59 @@ export const statusLabel: Record<EventStatus, string> = {
   scheduled: "예정",
 };
 
-export const calendarEventColors = {
+export const calendarEventAccentColors = {
   past: "#bfbfbf",
   ongoing: "#52c41a",
   scheduled: "#faad14",
 } as const;
+
+/** 캘린더 막대용 연한 배경색 (불투명 — segment 겹침 시 경계선이 보이지 않음) */
+export const calendarEventBarColors = {
+  past: "#f0f0f0",
+  ongoing: "#edf9e8",
+  scheduled: "#fff4e0",
+} as const;
+
+export type EventColorKey = keyof typeof calendarEventAccentColors;
+
+function resolveEventColorKey(
+  cellDate: Dayjs,
+  event: Pick<CalendarEvent, "status">,
+  now: Dayjs = dayjs(),
+): EventColorKey {
+  if (cellDate.startOf("day").isBefore(now.startOf("day"))) {
+    return "past";
+  }
+
+  switch (event.status) {
+    case "ongoing":
+      return "ongoing";
+    case "scheduled":
+      return "scheduled";
+    case "completed":
+      return "past";
+  }
+}
+
+export function getBarTextColor(): string {
+  return "rgba(0, 0, 0, 0.75)";
+}
+
+export function getEventAccentColor(
+  cellDate: Dayjs,
+  event: Pick<CalendarEvent, "status">,
+  now?: Dayjs,
+): string {
+  return calendarEventAccentColors[resolveEventColorKey(cellDate, event, now)];
+}
+
+export function getEventBarBackgroundColor(
+  cellDate: Dayjs,
+  event: Pick<CalendarEvent, "status">,
+  now?: Dayjs,
+): string {
+  return calendarEventBarColors[resolveEventColorKey(cellDate, event, now)];
+}
 
 export type BarSegment = "single" | "start" | "middle" | "end";
 
@@ -41,33 +89,6 @@ export type ProjectSpan = {
   startDate: string;
   endDate: string;
 };
-
-export function getBarTextColor(background: string): string {
-  if (background === calendarEventColors.ongoing) {
-    return "#fff";
-  }
-
-  return "rgba(0, 0, 0, 0.88)";
-}
-
-export function getEventBadgeColor(
-  cellDate: Dayjs,
-  event: Pick<CalendarEvent, "status">,
-  now: Dayjs = dayjs(),
-): string {
-  if (cellDate.startOf("day").isBefore(now.startOf("day"))) {
-    return calendarEventColors.past;
-  }
-
-  switch (event.status) {
-    case "ongoing":
-      return calendarEventColors.ongoing;
-    case "scheduled":
-      return calendarEventColors.scheduled;
-    case "completed":
-      return calendarEventColors.past;
-  }
-}
 
 function mapProjectStatus(status: ProjectStatus): EventStatus {
   switch (status) {

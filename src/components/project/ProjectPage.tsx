@@ -8,7 +8,7 @@ import {
   UnorderedListOutlined,
 } from "@ant-design/icons";
 import { App, Button, Card, Input, Progress, Space, Table, Tag } from "antd";
-import type { ColumnsType } from "antd/es/table";
+import type { TableColumnsType, TableProps } from "antd";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import CreateProjectModal from "./CreateProjectModal";
@@ -18,22 +18,13 @@ import { fetchProjects } from "@/lib/api/project";
 import { ApiError } from "@/lib/api/client";
 import {
   formatBudget,
-  getStatusCounts,
   statusLabel,
   type Project,
   type ProjectStatus,
-  type StatusFilter,
 } from "./projectData";
 import styles from "./ProjectPage.module.css";
 
 type ViewMode = "list" | "grid";
-
-const statusFilters: { key: StatusFilter; label: string }[] = [
-  { key: "all", label: "전체" },
-  { key: "in_progress", label: "진행중" },
-  { key: "recruiting", label: "모집중" },
-  { key: "completed", label: "완료" },
-];
 
 const statusTagColor: Record<ProjectStatus, string> = {
   in_progress: "processing",
@@ -45,7 +36,6 @@ export default function ProjectPage() {
   const router = useRouter();
   const companySlug = useCompanySlug();
   const { message } = App.useApp();
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [searchText, setSearchText] = useState("");
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -71,17 +61,11 @@ export default function ProjectPage() {
     void loadProjects();
   }, [loadProjects]);
 
-  const statusCounts = useMemo(() => getStatusCounts(projects), [projects]);
-
   const filteredProjects = useMemo(() => {
     const keyword = searchText.trim().toLowerCase();
 
     return projects
       .filter((project) => {
-        if (statusFilter !== "all" && project.status !== statusFilter) {
-          return false;
-        }
-
         if (!keyword) {
           return true;
         }
@@ -92,7 +76,11 @@ export default function ProjectPage() {
         );
       })
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  }, [searchText, statusFilter, projects]);
+  }, [searchText, projects]);
+
+  const handleTableChange: TableProps<Project>["onChange"] = () => {
+    // antd Table column filter / sort는 dataSource 기준으로 클라이언트 처리
+  };
 
   const handleRowClick = (record: Project) => {
     router.push(companyPath(companySlug, `project/${record.id}`));
@@ -103,30 +91,36 @@ export default function ProjectPage() {
     return Boolean(element.closest(".ant-checkbox-wrapper") || element.closest(".ant-checkbox"));
   };
 
-  const columns: ColumnsType<Project> = [
+  const columns: TableColumnsType<Project> = [
     {
       title: "프로젝트",
       dataIndex: "name",
       key: "name",
-      width: 180,
+      width: "22%",
       ellipsis: true,
+      sorter: (a, b) => a.name.localeCompare(b.name, "ko"),
     },
     {
       title: "장소",
       dataIndex: "location",
       key: "location",
+      width: "22%",
       ellipsis: true,
+      sorter: (a, b) => a.location.localeCompare(b.location, "ko"),
     },
     {
       title: "기간",
       key: "period",
-      width: 120,
+      width: "12%",
+      sorter: (a, b) => a.createdAt.localeCompare(b.createdAt),
       render: (_, record) => `${record.startDate} - ${record.endDate}`,
     },
     {
       title: "크루",
       key: "crew",
-      width: 100,
+      width: "10%",
+      sorter: (a, b) =>
+        a.crewCurrent / a.crewTotal - b.crewCurrent / b.crewTotal,
       render: (_, record) => {
         const percent = Math.round((record.crewCurrent / record.crewTotal) * 100);
         return (
@@ -138,29 +132,37 @@ export default function ProjectPage() {
       title: "매니저",
       dataIndex: "manager",
       key: "manager",
-      width: 100,
+      width: "10%",
       render: (value: string | null) => value ?? "-",
     },
     {
       title: "예산",
       dataIndex: "budget",
       key: "budget",
-      width: 120,
+      width: "10%",
+      sorter: (a, b) => a.budget - b.budget,
       render: (value: number) => formatBudget(value),
     },
     {
       title: "진행률",
+      dataIndex: "progress",
       key: "progress",
-      width: 100,
-      render: (_, record) => (
-        <Progress percent={record.progress} showInfo={false} size="small" />
-      ),
+      width: "10%",
+      sorter: (a, b) => a.progress - b.progress,
+      render: (value: number) => <Progress percent={value} showInfo={false} size="small" />,
     },
     {
       title: "상태",
       dataIndex: "status",
       key: "status",
-      width: 90,
+      width: "10%",
+      filters: [
+        { text: statusLabel.in_progress, value: "in_progress" },
+        { text: statusLabel.recruiting, value: "recruiting" },
+        { text: statusLabel.completed, value: "completed" },
+      ],
+      filterSearch: true,
+      onFilter: (value, record) => record.status === value,
       render: (value: ProjectStatus) => (
         <Tag color={statusTagColor[value]}>{statusLabel[value]}</Tag>
       ),
@@ -182,28 +184,14 @@ export default function ProjectPage() {
       </div>
 
       <div className={styles.toolbar}>
-        <div className={styles.statusTabs}>
-          {statusFilters.map((item) => (
-            <button
-              key={item.key}
-              type="button"
-              className={`${styles.statusTab} ${statusFilter === item.key ? styles.statusTabActive : ""}`}
-              onClick={() => setStatusFilter(item.key)}
-            >
-              {item.label} {statusCounts[item.key]}
-            </button>
-          ))}
-        </div>
-
-        <div className={styles.toolbarRight}>
-          <Input.Search
-            allowClear
-            className={styles.searchInput}
-            placeholder="프로젝트명, 장소로 검색"
-            value={searchText}
-            onChange={(event) => setSearchText(event.target.value)}
-          />
-          <div className={styles.viewToggle}>
+        <Input.Search
+          allowClear
+          className={styles.searchInput}
+          placeholder="프로젝트명, 장소로 검색"
+          value={searchText}
+          onChange={(event) => setSearchText(event.target.value)}
+        />
+        <div className={styles.viewToggle}>
             <button
               type="button"
               aria-label="리스트 보기"
@@ -218,22 +206,20 @@ export default function ProjectPage() {
               className={`${styles.viewButton} ${viewMode === "grid" ? styles.viewButtonActive : ""}`}
               onClick={() => setViewMode("grid")}
             >
-              <AppstoreOutlined />
-            </button>
-          </div>
+            <AppstoreOutlined />
+          </button>
         </div>
       </div>
 
       {viewMode === "list" ? (
         <Table<Project>
+          className={styles.projectTable}
           rowKey="id"
-          size="small"
-          bordered
           loading={loading}
           columns={columns}
           dataSource={filteredProjects}
-          pagination={false}
-          scroll={{ x: 1100 }}
+          onChange={handleTableChange}
+          scroll={{ x: "max-content" }}
           rowSelection={{
             selectedRowKeys,
             onChange: setSelectedRowKeys,

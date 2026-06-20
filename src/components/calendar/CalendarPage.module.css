@@ -22,9 +22,10 @@
   );
   /* 막대 좌우 여백 — start/end·single에만 적용, middle은 셀 전체 너비로 연결 */
   --calendar-events-inline-padding: 8px;
-  --calendar-bar-overlap: 2px;
+  --calendar-bar-overlap: 3px;
   --calendar-bar-height: 24px;
   --calendar-events-top-gap: 10px;
+  --calendar-events-bottom-gap: 8px;
 }
 
 .calendarWrap :global(.ant-picker-content tbody tr) {
@@ -63,6 +64,7 @@
   max-height: none !important;
   overflow: visible !important;
   padding-top: var(--calendar-events-top-gap);
+  padding-bottom: var(--calendar-events-bottom-gap);
 }
 
 .events {
@@ -84,6 +86,7 @@
   margin-bottom: 4px;
   padding: 0 8px;
   overflow: hidden;
+  border: none;
   font-size: 13px;
   font-weight: 500;
   line-height: var(--calendar-bar-height);

@@ -16,8 +16,9 @@ import {
   buildCalendarEvents,
   buildProjectSpans,
   getBarSegment,
+  getEventAccentColor,
+  getEventBarBackgroundColor,
   getBarTextColor,
-  getEventBadgeColor,
   getEventsByDate,
   getEventsInMonth,
   getProjectSpansForDate,
@@ -83,7 +84,7 @@ export default function CalendarPage() {
       <ul className={styles.events}>
         {spans.map((span) => {
           const segment = getBarSegment(value, span.startDate, span.endDate);
-          const color = getEventBadgeColor(value, span);
+          const barColor = getEventBarBackgroundColor(value, span);
           const showLabel = shouldShowBarLabel(value, span.startDate, span.endDate, segment);
           const segmentClass =
             segment === "single"
@@ -98,7 +99,10 @@ export default function CalendarPage() {
             <li key={`${span.projectId}-${dateKey}`}>
               <div
                 className={`${styles.eventBar} ${segmentClass}${showLabel ? ` ${styles.eventBar_labeled}` : ""}`}
-                style={{ backgroundColor: color, color: getBarTextColor(color) }}
+                style={{
+                  backgroundColor: barColor,
+                  color: getBarTextColor(),
+                }}
                 title={span.title}
               >
                 {showLabel ? span.title : "\u00A0"}
@@ -170,7 +174,7 @@ export default function CalendarPage() {
           {selectedEvents.length > 0 ? (
             <div className={styles.eventList}>
               {selectedEvents.map((event) => {
-                const accentColor = getEventBadgeColor(selectedDate, event);
+                const accentColor = getEventAccentColor(selectedDate, event);
 
                 return (
                   <div
