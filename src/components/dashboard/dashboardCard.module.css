@@ -1,0 +1,11 @@
+.dashboardCardHead :global(.ant-card-head) {
+  min-height: 48px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.dashboardCardHead :global(.ant-card-head-title) {
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.45);
+  line-height: 1.4;
+}
