@@ -273,6 +273,7 @@ export default function ProjectPage() {
       )}
 
       <CreateProjectModal
+        variant="drawer"
         open={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
         onCreated={loadProjects}

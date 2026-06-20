@@ -584,6 +584,7 @@ export default function DashboardHome() {
         )}
 
         <CreateProjectModal
+          variant="drawer"
           open={createModalOpen}
           onClose={() => setCreateModalOpen(false)}
           onCreated={loadDashboard}

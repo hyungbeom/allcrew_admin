@@ -9,8 +9,8 @@ import {
   SortAscendingOutlined,
   StarFilled,
 } from "@ant-design/icons";
-import { App, Avatar, Button, Card, Input, Select, Table, Tag, Typography } from "antd";
-import type { ColumnsType } from "antd/es/table";
+import { App, Avatar, Button, Input, Select, Table, Tag, Typography } from "antd";
+import type { TableColumnsType, TableProps } from "antd";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   avatarColors,
@@ -69,15 +69,30 @@ export default function CrewDbPage() {
           crew.name.toLowerCase().includes(keyword) ||
           crew.phone.replace(/\D/g, "").includes(keyword.replace(/\D/g, ""))
         );
-      })
-      .sort((a, b) => b.workDays - a.workDays);
+      });
   }, [crewMembers, projectFilter, searchText]);
 
-  const columns: ColumnsType<CrewMember> = [
+  const roleFilters = useMemo(() => {
+    const roles = [...new Set(crewMembers.map((crew) => crew.role))];
+
+    return roles.map((role) => ({
+      text: role,
+      value: role,
+    }));
+  }, [crewMembers]);
+
+  const handleTableChange: TableProps<CrewMember>["onChange"] = (pagination) => {
+    if (pagination.current) {
+      setCurrentPage(pagination.current);
+    }
+  };
+
+  const columns: TableColumnsType<CrewMember> = [
     {
       title: "크루",
       key: "crew",
-      width: 220,
+      width: "22%",
+      sorter: (a, b) => a.name.localeCompare(b.name, "ko"),
       render: (_, record, index) => (
         <div className={styles.crewCell}>
           <Avatar size={40} style={{ backgroundColor: avatarColors[index % avatarColors.length] }}>
@@ -94,7 +109,11 @@ export default function CrewDbPage() {
       title: "주 직무",
       dataIndex: "role",
       key: "role",
-      width: 100,
+      width: "10%",
+      sorter: (a, b) => a.role.localeCompare(b.role, "ko"),
+      filters: roleFilters,
+      filterSearch: true,
+      onFilter: (value, record) => record.role === value,
       render: (value: string) => (
         <Tag variant="filled" className={styles.roleTag}>
           {value}
@@ -105,35 +124,40 @@ export default function CrewDbPage() {
       title: "누적 프로젝트",
       dataIndex: "projectCount",
       key: "projectCount",
-      width: 120,
+      width: "12%",
+      sorter: (a, b) => a.projectCount - b.projectCount,
       render: (value: number) => `${value}건`,
     },
     {
       title: "누적 근무",
       dataIndex: "workDays",
       key: "workDays",
-      width: 100,
+      width: "10%",
+      sorter: (a, b) => a.workDays - b.workDays,
+      defaultSortOrder: "descend",
       render: (value: number) => `${value}일`,
     },
     {
       title: "최근 근무",
       dataIndex: "recentWorkDate",
       key: "recentWorkDate",
-      width: 120,
+      width: "12%",
+      sorter: (a, b) => a.recentWorkDate.localeCompare(b.recentWorkDate),
       render: (value: string) => formatRecentWork(value),
     },
     {
       title: "안전교육",
       dataIndex: "safetyTraining",
       key: "safetyTraining",
-      width: 100,
+      width: "10%",
       render: (value: string | null) => value ?? "-",
     },
     {
       title: "평점",
       dataIndex: "rating",
       key: "rating",
-      width: 90,
+      width: "10%",
+      sorter: (a, b) => a.rating - b.rating,
       render: (value: number) => (
         <span className={styles.ratingCell}>
           <StarFilled className={styles.ratingStar} />
@@ -144,7 +168,7 @@ export default function CrewDbPage() {
     {
       title: "",
       key: "actions",
-      width: 88,
+      width: "10%",
       align: "right",
       render: () => (
         <div className={styles.actionCell}>
@@ -198,23 +222,22 @@ export default function CrewDbPage() {
         </div>
       </div>
 
-      <Card className={styles.tableCard} styles={{ body: { padding: 0 } }}>
-        <Table<CrewMember>
-          rowKey="id"
-          columns={columns}
-          dataSource={filteredCrew}
-          loading={loading}
-          scroll={{ x: 960 }}
-          pagination={{
-            current: currentPage,
-            pageSize: PAGE_SIZE,
-            total: filteredCrew.length,
-            showSizeChanger: false,
-            showTotal: (total, range) => `${total}개 중 ${range[0]}-${range[1]} 표시`,
-            onChange: (page) => setCurrentPage(page),
-          }}
-        />
-      </Card>
+      <Table<CrewMember>
+        className={styles.crewTable}
+        rowKey="id"
+        columns={columns}
+        dataSource={filteredCrew}
+        loading={loading}
+        onChange={handleTableChange}
+        scroll={{ x: "max-content" }}
+        pagination={{
+          current: currentPage,
+          pageSize: PAGE_SIZE,
+          total: filteredCrew.length,
+          showSizeChanger: false,
+          showTotal: (total, range) => `${total}개 중 ${range[0]}-${range[1]} 표시`,
+        }}
+      />
     </div>
   );
 }

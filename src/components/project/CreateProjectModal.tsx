@@ -21,6 +21,7 @@ import {
   Form,
   Input,
   InputNumber,
+  Drawer,
   Modal,
   Space,
   Steps,
@@ -151,12 +152,14 @@ type CreateProjectModalProps = {
   open: boolean;
   onClose: () => void;
   onCreated?: () => void;
+  variant?: "modal" | "drawer";
 };
 
 export default function CreateProjectModal({
   open,
   onClose,
   onCreated,
+  variant = "modal",
 }: CreateProjectModalProps) {
   const { message } = App.useApp();
   const [form] = Form.useForm<CreateProjectFormValues>();
@@ -574,6 +577,88 @@ export default function CreateProjectModal({
     renderReviewStep(),
   ][step];
 
+  const handleOpen = (visible: boolean) => {
+    if (visible) {
+      form.setFieldsValue(getDefaultValues());
+    }
+  };
+
+  const formContent = (
+    <div className={variant === "drawer" ? styles.drawerContainer : styles.container}>
+      <div className={styles.header}>
+        <Typography.Title level={2} className={styles.title}>
+          새 프로젝트 생성
+        </Typography.Title>
+        <Typography.Text className={styles.subtitle}>
+          {[
+            "프로젝트의 기본 정보를 입력해주세요",
+            "기간, 시간, 행사 장소를 알려주세요",
+            "직무별로 필요한 크루 수와 급여를 정해주세요",
+            "근무시간, GPS 반경, 복리후생을 설정해주세요",
+            "모집 조건을 확인하고 생성해주세요",
+          ][step]}
+        </Typography.Text>
+      </div>
+
+      <div className={styles.stepsWrap}>
+        <Steps items={stepItems} size="small" />
+      </div>
+
+      <Form
+        form={form}
+        layout="vertical"
+        requiredMark={false}
+        initialValues={getDefaultValues()}
+        className={styles.body}
+      >
+        {stepContent}
+      </Form>
+
+      <div className={styles.footer}>
+        <div className={styles.footerActions}>
+          {step === 0 ? (
+            <Button icon={<LeftOutlined />} onClick={handleClose}>
+              취소
+            </Button>
+          ) : (
+            <Button icon={<LeftOutlined />} onClick={handlePrev}>
+              이전
+            </Button>
+          )}
+
+          {step < STEP_ITEMS.length - 1 ? (
+            <Button type="primary" onClick={handleNext}>
+              다음 <RightOutlined />
+            </Button>
+          ) : (
+            <Button type="primary" loading={submitting} onClick={handleSubmit}>
+              프로젝트 생성하기 <RightOutlined />
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  if (variant === "drawer") {
+    return (
+      <Drawer
+        open={open}
+        onClose={handleClose}
+        placement="right"
+        size={720}
+        destroyOnHidden
+        className={styles.drawer}
+        title={null}
+        closable={false}
+        styles={{ body: { padding: 0, overflow: "hidden" } }}
+        afterOpenChange={handleOpen}
+      >
+        {formContent}
+      </Drawer>
+    );
+  }
+
   return (
     <Modal
       open={open}
@@ -584,66 +669,9 @@ export default function CreateProjectModal({
       destroyOnHidden
       className={styles.modal}
       title={null}
-      afterOpenChange={(visible) => {
-        if (visible) {
-          form.setFieldsValue(getDefaultValues());
-        }
-      }}
+      afterOpenChange={handleOpen}
     >
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <Typography.Title level={2} className={styles.title}>
-            새 프로젝트 생성
-          </Typography.Title>
-          <Typography.Text className={styles.subtitle}>
-            {[
-              "프로젝트의 기본 정보를 입력해주세요",
-              "기간, 시간, 행사 장소를 알려주세요",
-              "직무별로 필요한 크루 수와 급여를 정해주세요",
-              "근무시간, GPS 반경, 복리후생을 설정해주세요",
-              "모집 조건을 확인하고 생성해주세요",
-            ][step]}
-          </Typography.Text>
-        </div>
-
-        <div className={styles.stepsWrap}>
-          <Steps items={stepItems} size="small" />
-        </div>
-
-        <Form
-          form={form}
-          layout="vertical"
-          requiredMark={false}
-          initialValues={getDefaultValues()}
-          className={styles.body}
-        >
-          {stepContent}
-        </Form>
-
-        <div className={styles.footer}>
-          <div className={styles.footerActions}>
-            {step === 0 ? (
-              <Button icon={<LeftOutlined />} onClick={handleClose}>
-                취소
-              </Button>
-            ) : (
-              <Button icon={<LeftOutlined />} onClick={handlePrev}>
-                이전
-              </Button>
-            )}
-
-            {step < STEP_ITEMS.length - 1 ? (
-              <Button type="primary" onClick={handleNext}>
-                다음 <RightOutlined />
-              </Button>
-            ) : (
-              <Button type="primary" loading={submitting} onClick={handleSubmit}>
-                프로젝트 생성하기 <RightOutlined />
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
+      {formContent}
     </Modal>
   );
 }

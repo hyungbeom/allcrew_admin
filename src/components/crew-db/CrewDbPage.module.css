@@ -41,13 +41,12 @@
   max-width: 280px;
 }
 
-.tableCard {
-  border-radius: 8px;
+.crewTable {
+  width: 100%;
 }
 
-.tableCard :global(.ant-table-thead > tr > th) {
-  background: #fafafa !important;
-  font-weight: 500;
+.crewTable :global(.ant-table) {
+  border-radius: 8px;
 }
 
 .crewCell {

@@ -14,6 +14,33 @@
   max-height: min(88vh, 820px);
 }
 
+.drawerContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  --panel-inline-padding: 40px;
+}
+
+.drawerContainer .header {
+  padding: 24px var(--panel-inline-padding) 0;
+}
+
+.drawerContainer .stepsWrap {
+  padding: 50px var(--panel-inline-padding) 50px;
+}
+
+.drawerContainer .body {
+  padding: 24px var(--panel-inline-padding);
+}
+
+.drawerContainer .footer {
+  padding: 16px var(--panel-inline-padding) 24px;
+}
+
+.drawer :global(.ant-drawer-header) {
+  display: none;
+}
+
 .header {
   padding: 24px 28px 0;
 }
