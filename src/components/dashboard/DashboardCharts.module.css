@@ -8,28 +8,30 @@
   box-shadow: none;
 }
 
-.chartCardHead {
-  margin-bottom: 8px;
-}
-
-.chartCardSubtitle {
+.chartBodyLead {
   display: block;
+  margin-bottom: 12px;
   font-size: 13px;
-  margin-bottom: 4px;
+  line-height: 1.4;
 }
 
 .chartCardValue {
-  margin: 0 !important;
+  margin: 0 0 12px !important;
   font-size: 30px !important;
   line-height: 1.2 !important;
   font-weight: 600 !important;
 }
 
-.chartCardTitle {
-  margin: 0 !important;
-  font-size: 16px !important;
-  line-height: 1.4 !important;
-  font-weight: 600 !important;
+.dualMiniChart {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.miniChartLabel {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
 }
 
 .yearToggle {
@@ -65,21 +67,21 @@
 
 .chartPieWrap {
   position: relative;
-  min-height: 280px;
+  min-height: 260px;
 }
 
 .pieLayout {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-height: 280px;
+  min-height: 260px;
 }
 
 .pieChartArea {
   position: relative;
   flex: 1;
   min-width: 0;
-  height: 280px;
+  height: 260px;
 }
 
 .pieCenter {

@@ -2,6 +2,33 @@
   display: flex;
 }
 
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.pageHeaderContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.pageTitle {
+  margin: 0 0 8px !important;
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+}
+
+.subtitle {
+  display: block;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.45);
+  line-height: 1.6;
+}
+
 .equalCard {
   flex: 1;
   width: 100%;
@@ -17,7 +44,7 @@
 }
 
 .attendanceCard :global(.ant-card-body) {
-  padding: 16px 24px 24px !important;
+  padding: 12px 16px 16px !important;
 }
 
 .attendanceSummary {
@@ -26,7 +53,7 @@
 
 .attendanceProgressWrap {
   width: 100%;
-  margin: 20px 0 28px;
+  margin: 12px 0 16px;
 }
 
 .attendanceProgressWrap :global(.ant-progress) {
@@ -57,6 +84,146 @@
 .topPanelRow {
   align-items: stretch;
   margin-bottom: 20px;
+}
+
+.cardExtraText {
+  font-size: 11px !important;
+  font-weight: 400 !important;
+  white-space: nowrap;
+}
+
+.attendanceMainValue {
+  margin: 0 !important;
+  font-size: 24px !important;
+  line-height: 1.2 !important;
+}
+
+.attendanceSubText {
+  font-size: 12px;
+}
+
+.compactStatList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.compactStatItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+}
+
+.compactStatLabel {
+  font-size: 12px;
+}
+
+.compactStatValue {
+  font-size: 14px;
+}
+
+.todayPanelCard :global(.ant-card-body) {
+  padding: 12px 16px 16px !important;
+}
+
+.todayPanelBody {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.todayPanelBody:not(.todayPanelBodyFilled) :global(.ant-empty) {
+  margin: 0;
+}
+
+.todayPanelBodyFilled {
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.topPanelRow .todayProjectList {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 10px;
+  width: 100%;
+}
+
+.topPanelRow .todayProjectCardLink {
+  flex: none;
+  max-width: 100%;
+  min-width: 0;
+  width: 100%;
+}
+
+.topPanelRow .todayProjectCard {
+  padding: 12px;
+  gap: 8px;
+}
+
+.topPanelRow .todayProjectName {
+  font-size: 15px !important;
+}
+
+.topPanelRow .todayProjectLocation {
+  font-size: 12px;
+}
+
+.topPanelRow .todayProjectCrewCount {
+  font-size: 11px;
+}
+
+.topPanelRow .siteItem {
+  min-height: 52px;
+  padding: 10px 12px;
+}
+
+.topPanelRow .siteItemLabel {
+  font-size: 12px;
+}
+
+.topPanelRow .siteItemValue {
+  font-size: 16px !important;
+}
+
+.topPanelRow .activityList {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.activityListEmpty {
+  align-items: center;
+  justify-content: center;
+}
+
+.activityListEmpty :global(.ant-empty),
+.topPanelRow .activityListEmpty :global(.ant-empty) {
+  margin: 0;
+}
+
+.topPanelRow .activityItem {
+  flex: 0 0 auto;
+  min-height: 40px;
+  gap: 8px;
+}
+
+.topPanelRow .activityText,
+.topPanelRow .activityDate {
+  font-size: 12px;
+}
+
+.topPanelRow :global(.ant-empty-description) {
+  font-size: 12px;
 }
 
 .statCol {
@@ -106,14 +273,29 @@
   display: flex;
 }
 
+.taskSection {
+  margin-bottom: 20px;
+}
+
+.taskSectionHead {
+  margin-bottom: 32px;
+}
+
+.taskSectionCards {
+  margin-top: 8px;
+}
+
+.taskSectionTitle {
+  margin: 0 !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+}
+
 .taskCard {
   width: 100%;
   border: 1px solid #f0f0f0;
   box-shadow: none;
-}
-
-.taskCardHead {
-  margin-bottom: 4px;
 }
 
 .taskCardInfoIcon {
@@ -153,7 +335,7 @@
 }
 
 .siteCard :global(.ant-card-body) {
-  padding: 16px 24px 24px !important;
+  padding: 12px 16px 16px !important;
 }
 
 .siteList {
@@ -190,6 +372,18 @@
 
 .siteHeaderTagContent :global(.anticon) {
   font-size: 11px;
+}
+
+.topPanelRow .siteHeaderTag {
+  max-width: 100%;
+  font-size: 11px;
+  padding: 4px 10px;
+}
+
+.topPanelRow .siteHeaderTagContent {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .siteItem {

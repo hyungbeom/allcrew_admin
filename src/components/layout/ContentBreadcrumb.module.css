@@ -5,6 +5,11 @@
   margin-bottom: 20px;
 }
 
+.pageHeaderDashboard {
+  gap: 0;
+  margin-bottom: 16px;
+}
+
 .breadcrumb {
   margin-bottom: 0;
 }

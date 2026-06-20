@@ -23,12 +23,15 @@ import {
   ArrowRightOutlined,
   EnvironmentOutlined,
   InfoCircleOutlined,
+  PlusOutlined,
   ProjectOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import CreateProjectModal from "@/components/project/CreateProjectModal";
 import styles from "./DashboardHome.module.css";
+import cardTheme from "./dashboardCard.module.css";
 import DashboardChartsLazy from "./DashboardChartsLazy";
 import { toSparklineData } from "./chartUtils";
 import { useCompanySlug } from "@/components/layout/CompanySlugProvider";
@@ -165,6 +168,7 @@ export default function DashboardHome() {
   const { message } = App.useApp();
   const [loading, setLoading] = useState(true);
   const [dashboard, setDashboard] = useState<DashboardApiResponse | null>(null);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
 
   const loadDashboard = useCallback(async () => {
     setLoading(true);
@@ -289,37 +293,84 @@ export default function DashboardHome() {
 
   const todayProjects = dashboard?.todayProjects ?? [];
   const activities = dashboard?.activities ?? [];
-  const nowLabel = new Date().toLocaleString("ko-KR", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-  });
+
+  const contractStats = useMemo(
+    () => [
+      { label: "서명 완료", value: dashboard?.contractStats?.signed ?? 0 },
+      { label: "서명 대기", value: dashboard?.contractStats?.pending ?? 0 },
+      { label: "미서명", value: dashboard?.contractStats?.unsigned ?? 0 },
+    ],
+    [dashboard?.contractStats],
+  );
+
+  const settlementStats = useMemo(
+    () => [
+      {
+        label: "정산 대기",
+        value: dashboard?.settlementStats?.pending ?? dashboard?.tasks?.pendingSettlements ?? 0,
+      },
+      { label: "승인 완료", value: dashboard?.settlementStats?.approved ?? 0 },
+      { label: "송금 완료", value: dashboard?.settlementStats?.paid ?? 0 },
+    ],
+    [dashboard?.settlementStats, dashboard?.tasks?.pendingSettlements],
+  );
+
+  const [nowLabel, setNowLabel] = useState("");
+
+  useEffect(() => {
+    const formatNow = () =>
+      new Date().toLocaleString("ko-KR", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      });
+
+    setNowLabel(formatNow());
+    const timer = window.setInterval(() => setNowLabel(formatNow()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   return (
     <Spin spinning={loading}>
       <>
+        <div className={styles.pageHeader}>
+          <div className={styles.pageHeaderContent}>
+            <Typography.Title level={2} className={styles.pageTitle}>
+              대시보드
+            </Typography.Title>
+            <Typography.Text className={styles.subtitle}>
+              실시간 근태, 현장 관리, 오늘의 현장, 최근 활동을 한눈에 확인하세요.
+            </Typography.Text>
+          </div>
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalOpen(true)}>
+            새 프로젝트
+          </Button>
+        </div>
+
         <Row gutter={[16, 16]} align="stretch" className={styles.topPanelRow}>
-          <Col xs={24} lg={14} className={styles.equalCol}>
+          <Col xs={24} sm={12} lg={6} xl={6} className={styles.equalCol}>
             <Card
-              className={`${styles.equalCard} ${styles.attendanceCard}`}
+              className={`${cardTheme.dashboardCardHead} ${styles.equalCard} ${styles.attendanceCard}`}
               title="실시간 근태"
               extra={
-                <Typography.Text type="secondary" style={{ fontSize: 13, fontWeight: 400 }}>
-                  {nowLabel} 기준
+                <Typography.Text type="secondary" className={styles.cardExtraText}>
+                  {nowLabel ? `${nowLabel} 기준` : "기준"}
                 </Typography.Text>
               }
               styles={{ body: { display: "flex", flexDirection: "column", flex: 1 } }}
             >
               <div className={styles.attendanceSummary}>
-                <Flex align="baseline" gap={16} wrap="wrap">
-                  <Typography.Title level={2} style={{ margin: 0 }}>
+                <Flex align="baseline" gap={8} wrap="wrap">
+                  <Typography.Title level={3} className={styles.attendanceMainValue}>
                     {attendanceCount} / {totalCount}명
                   </Typography.Title>
-                  <Typography.Text type="secondary">현재 출근 {attendancePercent}%</Typography.Text>
+                  <Typography.Text type="secondary" className={styles.attendanceSubText}>
+                    출근 {attendancePercent}%
+                  </Typography.Text>
                 </Flex>
               </div>
 
@@ -329,41 +380,28 @@ export default function DashboardHome() {
                   showInfo={false}
                   strokeColor={attendanceProgressColors}
                   strokeLinecap="round"
-                  size={[-1, 10]}
+                  size={[-1, 8]}
                 />
               </div>
 
-              <Row gutter={[12, 12]} className={styles.attendanceStatsRow}>
+              <div className={styles.compactStatList}>
                 {attendanceStats.map((stat) => (
-                  <Col xs={24} sm={8} key={stat.label} className={styles.statCol}>
-                    <div className={styles.statItem}>
-                      <div className={styles.statItemContent}>
-                        <Typography.Text type="secondary" className={styles.statItemLabel}>
-                          {stat.label}
-                        </Typography.Text>
-                        <Typography.Title level={3} className={styles.statItemValue}>
-                          {stat.value}
-                        </Typography.Title>
-                      </div>
-                      <Progress
-                        type="circle"
-                        percent={stat.percent}
-                        strokeColor={attendanceProgressColors}
-                        railColor="#e8e8e8"
-                        size={52}
-                        showInfo={false}
-                        className={styles.statItemProgress}
-                      />
-                    </div>
-                  </Col>
+                  <div key={stat.label} className={styles.compactStatItem}>
+                    <Typography.Text type="secondary" className={styles.compactStatLabel}>
+                      {stat.label}
+                    </Typography.Text>
+                    <Typography.Text strong className={styles.compactStatValue}>
+                      {stat.value}
+                    </Typography.Text>
+                  </div>
                 ))}
-              </Row>
+              </div>
             </Card>
           </Col>
 
-          <Col xs={24} lg={10} className={styles.equalCol}>
+          <Col xs={24} sm={12} lg={6} xl={6} className={styles.equalCol}>
             <Card
-              className={`${styles.equalCard} ${styles.siteCard}`}
+              className={`${cardTheme.dashboardCardHead} ${styles.equalCard} ${styles.siteCard}`}
               title="현장 관리"
               extra={
                 <Tag variant="filled" color="processing" className={styles.siteHeaderTag}>
@@ -378,84 +416,34 @@ export default function DashboardHome() {
               <div className={styles.siteList}>
                 {siteStats.map((item) => (
                   <div key={item.label} className={styles.siteItem}>
-                    <Space size={12}>
-                      <Avatar size={36} icon={item.icon} className={styles.siteItemIcon} />
+                    <Space size={8}>
+                      <Avatar size={32} icon={item.icon} className={styles.siteItemIcon} />
                       <Typography.Text className={styles.siteItemLabel}>{item.label}</Typography.Text>
                     </Space>
-                    <Typography.Title level={4} className={styles.siteItemValue}>
+                    <Typography.Text strong className={styles.siteItemValue}>
                       {item.value}
-                    </Typography.Title>
+                    </Typography.Text>
                   </div>
                 ))}
               </div>
             </Card>
           </Col>
-        </Row>
 
-        <Card
-          title="오늘 처리할 일"
-          extra={
-            <Typography.Text type="secondary" style={{ fontSize: 13 }}>
-              우선순위 순
-            </Typography.Text>
-          }
-          style={{ marginBottom: 20 }}
-          styles={{ body: { padding: "20px 24px 24px" } }}
-        >
-          <Row gutter={[24, 24]}>
-            {tasks.map((task) => (
-              <Col xs={24} sm={12} xl={6} key={task.key} className={styles.taskCol}>
-                <Card className={styles.taskCard} styles={{ body: { padding: "20px 24px 8px" } }}>
-                  <Flex justify="space-between" align="center" className={styles.taskCardHead}>
-                    <Typography.Text type="secondary">{task.label}</Typography.Text>
-                    <Tooltip title={task.tooltip}>
-                      <InfoCircleOutlined className={styles.taskCardInfoIcon} />
-                    </Tooltip>
-                  </Flex>
-
-                  <Typography.Title level={3} className={styles.taskCardValue}>
-                    {task.value}
-                  </Typography.Title>
-
-                  <TaskCardContent task={task} />
-
-                  <Divider className={styles.taskCardDivider} />
-
-                  <div className={styles.taskCardFooter}>
-                    <Typography.Text type="secondary">{task.footerLabel}</Typography.Text>
-                    <Typography.Text>{task.footerValue}</Typography.Text>
-                  </div>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        </Card>
-
-        <Row gutter={[16, 16]} align="stretch" className={styles.bottomPanelRow}>
-          <Col xs={24} xl={15} className={styles.bottomPanelCol}>
+          <Col xs={24} sm={12} lg={6} xl={6} className={styles.equalCol}>
             <Card
-              className={styles.bottomPanelCard}
-              title={
-                <div>
-                  <Typography.Title level={5} style={{ margin: 0 }}>
-                    오늘의 현장
-                  </Typography.Title>
-                  <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-                    오늘 진행 중인 프로젝트 {todayProjects.length}건
-                  </Typography.Text>
-                </div>
-              }
+              className={`${cardTheme.dashboardCardHead} ${styles.equalCard} ${styles.todayPanelCard}`}
+              title="오늘의 현장"
               extra={
                 <Link href={companyPath(companySlug, "project")} className={styles.todayPanelLink}>
-                  전체보기
+                  전체
                   <ArrowRightOutlined />
                 </Link>
               }
-              styles={{ body: { display: "flex", flexDirection: "column", flex: 1, paddingTop: 16 } }}
+              styles={{ body: { display: "flex", flexDirection: "column", flex: 1, paddingTop: 12 } }}
             >
               <div
-                className={`${styles.bottomPanelBody} ${
-                  todayProjects.length > 0 ? styles.bottomPanelBodyFilled : ""
+                className={`${styles.todayPanelBody} ${
+                  todayProjects.length > 0 ? styles.todayPanelBodyFilled : ""
                 }`}
               >
                 {todayProjects.length === 0 ? (
@@ -478,31 +466,85 @@ export default function DashboardHome() {
             </Card>
           </Col>
 
-          <Col xs={24} xl={9} className={styles.bottomPanelCol}>
+          <Col xs={24} sm={12} lg={6} xl={6} className={styles.equalCol}>
             <Card
               title="최근 활동"
-              className={`${styles.bottomPanelCard} ${styles.activityCard}`}
+              className={`${cardTheme.dashboardCardHead} ${styles.equalCard} ${styles.activityCard}`}
               styles={{ body: { display: "flex", flexDirection: "column", flex: 1, paddingTop: 0 } }}
             >
-              <div className={styles.activityList}>
-                {activities.slice(0, MAX_ACTIVITY_ITEMS).map((item) => (
-                  <div key={`${item.text}-${item.date}`} className={styles.activityItem}>
-                    <Typography.Text ellipsis className={styles.activityText}>
-                      {item.text}
-                    </Typography.Text>
-                    <Typography.Text type="secondary" className={styles.activityDate}>
-                      {item.date}
-                    </Typography.Text>
-                  </div>
-                ))}
+              <div
+                className={`${styles.activityList} ${
+                  activities.length === 0 ? styles.activityListEmpty : ""
+                }`}
+              >
+                {activities.length === 0 ? (
+                  <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="최근 활동이 없어요." />
+                ) : (
+                  activities.slice(0, MAX_ACTIVITY_ITEMS).map((item) => (
+                    <div key={`${item.text}-${item.date}`} className={styles.activityItem}>
+                      <Typography.Text ellipsis className={styles.activityText}>
+                        {item.text}
+                      </Typography.Text>
+                      <Typography.Text type="secondary" className={styles.activityDate}>
+                        {item.date}
+                      </Typography.Text>
+                    </div>
+                  ))
+                )}
               </div>
             </Card>
           </Col>
         </Row>
 
+        <div className={styles.taskSection}>
+          <div className={styles.taskSectionHead}>
+            <Typography.Title level={5} className={styles.taskSectionTitle}>
+              오늘 처리할 일
+            </Typography.Title>
+          </div>
+
+          <Row gutter={[24, 24]} className={styles.taskSectionCards}>
+            {tasks.map((task) => (
+              <Col xs={24} sm={12} xl={6} key={task.key} className={styles.taskCol}>
+                <Card
+                  className={`${cardTheme.dashboardCardHead} ${styles.taskCard}`}
+                  title={task.label}
+                  extra={
+                    <Tooltip title={task.tooltip}>
+                      <InfoCircleOutlined className={styles.taskCardInfoIcon} />
+                    </Tooltip>
+                  }
+                  styles={{ body: { padding: "16px 24px 8px" } }}
+                >
+                  <Typography.Title level={3} className={styles.taskCardValue}>
+                    {task.value}
+                  </Typography.Title>
+
+                  <TaskCardContent task={task} />
+
+                  <Divider className={styles.taskCardDivider} />
+
+                  <div className={styles.taskCardFooter}>
+                    <Typography.Text type="secondary">{task.footerLabel}</Typography.Text>
+                    <Typography.Text>{task.footerValue}</Typography.Text>
+                  </div>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </div>
+
         <DashboardChartsLazy
           monthlySales={dashboard?.monthlySales ?? []}
           categoryDistribution={dashboard?.categoryDistribution ?? []}
+          contractStats={contractStats}
+          settlementStats={settlementStats}
+        />
+
+        <CreateProjectModal
+          open={createModalOpen}
+          onClose={() => setCreateModalOpen(false)}
+          onCreated={loadDashboard}
         />
       </>
     </Spin>

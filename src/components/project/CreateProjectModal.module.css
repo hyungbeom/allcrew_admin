@@ -18,14 +18,6 @@
   padding: 24px 28px 0;
 }
 
-.stepLabel {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #1677ff;
-}
-
 .title {
   margin: 0 0 6px !important;
   font-size: 24px !important;
@@ -40,21 +32,59 @@
 }
 
 .stepsWrap {
-  padding: 20px 28px 0;
+  padding: 32px 28px 24px;
 }
 
-.stepsWrap :global(.ant-steps-navigation) {
-  padding-top: 0;
+.stepsWrap :global(.ant-steps) {
+  max-width: 100%;
 }
 
-.stepsWrap :global(.ant-steps-item-container) {
-  padding-bottom: 12px;
+.stepsWrap :global(.ant-steps-item-title) {
+  font-size: 12px !important;
+  line-height: 1.4 !important;
+  white-space: nowrap;
+}
+
+.stepsWrap :global(.ant-steps-item-process .ant-steps-item-icon) {
+  background-color: #1677ff;
+  border-color: #1677ff;
+}
+
+.stepsWrap :global(.ant-steps-item-process .ant-steps-item-title) {
+  color: rgba(0, 0, 0, 0.88) !important;
+  font-weight: 600 !important;
+}
+
+.stepsWrap :global(.ant-steps-item-finish .ant-steps-item-icon) {
+  background-color: #e6f4ff;
+  border-color: #1677ff;
+}
+
+.stepsWrap :global(.ant-steps-item-finish .ant-steps-item-icon .ant-steps-icon) {
+  color: #1677ff;
+}
+
+.stepsWrap :global(.ant-steps-item-finish > .ant-steps-item-container > .ant-steps-item-tail::after) {
+  background-color: #1677ff;
+}
+
+.stepsWrap :global(.ant-steps-item-wait .ant-steps-item-icon) {
+  background-color: #fff;
+  border-color: #d9d9d9;
+}
+
+.stepsWrap :global(.ant-steps-item-wait .ant-steps-item-title) {
+  color: rgba(0, 0, 0, 0.45) !important;
 }
 
 .body {
   flex: 1;
   overflow-y: auto;
   padding: 24px 28px;
+}
+
+.body :global(textarea) {
+  resize: none;
 }
 
 .formSection {
@@ -73,35 +103,6 @@
 
 .required {
   color: #ff4d4f;
-}
-
-.eventTypeGroup {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.eventTypeButton {
-  height: 36px;
-  padding: 0 16px;
-  border: 1px solid #d9d9d9;
-  border-radius: 999px;
-  background: #fff;
-  color: rgba(0, 0, 0, 0.65);
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.eventTypeButton:hover {
-  border-color: #141414;
-  color: rgba(0, 0, 0, 0.88);
-}
-
-.eventTypeButtonActive {
-  border-color: #141414;
-  background: #141414;
-  color: #fff;
 }
 
 .uploadBox :global(.ant-upload-drag) {
@@ -362,15 +363,16 @@
 
 .footer {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  justify-content: flex-end;
   padding: 16px 28px 24px;
   border-top: 1px solid #f0f0f0;
 }
 
-.footerRight {
-  margin-left: auto;
+.footerActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
 }
 
 @media (max-width: 640px) {

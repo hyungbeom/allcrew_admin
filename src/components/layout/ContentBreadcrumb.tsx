@@ -4,15 +4,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Breadcrumb, Typography } from "antd";
 import { getBreadcrumb, getPageTitle } from "@/config/navigation";
+import { parseAppPathname } from "@/lib/companyPaths";
 import styles from "./ContentBreadcrumb.module.css";
 
 export default function ContentBreadcrumb() {
   const pathname = usePathname();
+  const { routePath } = parseAppPathname(pathname);
+  const isDashboard = routePath === "/dashboard";
   const breadcrumbItems = getBreadcrumb(pathname);
   const pageTitle = getPageTitle(pathname);
 
   return (
-    <div className={styles.pageHeader}>
+    <div className={`${styles.pageHeader} ${isDashboard ? styles.pageHeaderDashboard : ""}`}>
       <Breadcrumb
         className={styles.breadcrumb}
         items={breadcrumbItems.map((item, index) => {
@@ -29,9 +32,11 @@ export default function ContentBreadcrumb() {
           };
         })}
       />
-      <Typography.Title level={2} className={styles.pageTitle}>
-        {pageTitle}
-      </Typography.Title>
+      {!isDashboard && (
+        <Typography.Title level={2} className={styles.pageTitle}>
+          {pageTitle}
+        </Typography.Title>
+      )}
     </div>
   );
 }

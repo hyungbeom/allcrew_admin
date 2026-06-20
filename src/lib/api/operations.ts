@@ -39,6 +39,8 @@ export type DashboardApiResponse = {
   activities: { text: string; date: string }[];
   monthlySales: { month: string; value: number }[];
   categoryDistribution: { category: string; value: number }[];
+  contractStats?: { signed: number; pending: number; unsigned: number };
+  settlementStats?: { pending: number; approved: number; paid: number };
 };
 
 export type CrewListApiResponse = { items: CrewMember[]; total: number };

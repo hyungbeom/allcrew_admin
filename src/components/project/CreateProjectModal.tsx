@@ -2,13 +2,17 @@
 
 import {
   CalendarOutlined,
+  CheckCircleOutlined,
   ClockCircleOutlined,
   DeleteOutlined,
   EnvironmentOutlined,
+  FileTextOutlined,
   InfoCircleOutlined,
   LeftOutlined,
+  LoadingOutlined,
   PlusOutlined,
   RightOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
 import {
   App,
@@ -19,6 +23,7 @@ import {
   Input,
   InputNumber,
   Modal,
+  Radio,
   Steps,
   TimePicker,
   Typography,
@@ -75,11 +80,11 @@ const WELFARE_OPTIONS = [
 ] as const;
 
 const STEP_ITEMS = [
-  { title: "기본 정보" },
-  { title: "일정 & 장소" },
-  { title: "포지션" },
-  { title: "근무 조건" },
-  { title: "모집 & 검토" },
+  { title: "기본 정보", icon: FileTextOutlined },
+  { title: "일정 & 장소", icon: CalendarOutlined },
+  { title: "포지션", icon: TeamOutlined },
+  { title: "근무 조건", icon: ClockCircleOutlined },
+  { title: "모집 & 검토", icon: CheckCircleOutlined },
 ];
 
 const STEP_FIELDS: (keyof CreateProjectFormValues)[][] = [
@@ -173,6 +178,28 @@ export default function CreateProjectModal({
   const dailyLaborCost = useMemo(
     () => calculateDailyLaborCost(positions, workStartTime, workEndTime, breakMinutes),
     [positions, workStartTime, workEndTime, breakMinutes],
+  );
+
+  const stepItems = useMemo(
+    () =>
+      STEP_ITEMS.map((item, index) => {
+        let status: "finish" | "process" | "wait" = "wait";
+        if (index < step) {
+          status = "finish";
+        } else if (index === step) {
+          status = "process";
+        }
+
+        const Icon = item.icon;
+        const isLastStepProcessing = submitting && index === STEP_ITEMS.length - 1 && step === index;
+
+        return {
+          title: item.title,
+          status,
+          icon: isLastStepProcessing ? <LoadingOutlined /> : <Icon />,
+        };
+      }),
+    [step, submitting],
   );
 
   const resetModal = () => {
@@ -568,11 +595,8 @@ export default function CreateProjectModal({
     >
       <div className={styles.container}>
         <div className={styles.header}>
-          <span className={styles.stepLabel}>
-            새 프로젝트 만들기 - {step + 1}/{STEP_ITEMS.length}
-          </span>
           <Typography.Title level={2} className={styles.title}>
-            {STEP_ITEMS[step].title}
+            새 프로젝트 생성
           </Typography.Title>
           <Typography.Text className={styles.subtitle}>
             {[
@@ -586,7 +610,7 @@ export default function CreateProjectModal({
         </div>
 
         <div className={styles.stepsWrap}>
-          <Steps current={step} items={STEP_ITEMS} type="navigation" size="small" />
+          <Steps items={stepItems} size="small" />
         </div>
 
         <Form
@@ -600,17 +624,17 @@ export default function CreateProjectModal({
         </Form>
 
         <div className={styles.footer}>
-          {step === 0 ? (
-            <Button icon={<LeftOutlined />} onClick={handleClose}>
-              취소
-            </Button>
-          ) : (
-            <Button icon={<LeftOutlined />} onClick={handlePrev}>
-              이전
-            </Button>
-          )}
+          <div className={styles.footerActions}>
+            {step === 0 ? (
+              <Button icon={<LeftOutlined />} onClick={handleClose}>
+                취소
+              </Button>
+            ) : (
+              <Button icon={<LeftOutlined />} onClick={handlePrev}>
+                이전
+              </Button>
+            )}
 
-          <div className={styles.footerRight}>
             {step < STEP_ITEMS.length - 1 ? (
               <Button type="primary" onClick={handleNext}>
                 다음 <RightOutlined />
@@ -635,18 +659,13 @@ function EventTypeSelector({
   onChange?: (value: EventType) => void;
 }) {
   return (
-    <div className={styles.eventTypeGroup}>
+    <Radio.Group value={value} buttonStyle="solid" onChange={(event) => onChange?.(event.target.value)}>
       {EVENT_TYPES.map((type) => (
-        <button
-          key={type}
-          type="button"
-          className={`${styles.eventTypeButton} ${value === type ? styles.eventTypeButtonActive : ""}`}
-          onClick={() => onChange?.(type)}
-        >
+        <Radio.Button key={type} value={type}>
           {type}
-        </button>
+        </Radio.Button>
       ))}
-    </div>
+    </Radio.Group>
   );
 }
 

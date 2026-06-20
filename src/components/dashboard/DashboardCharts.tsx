@@ -1,10 +1,11 @@
 "use client";
 
-import { Line, Pie } from "@ant-design/charts";
-import { Button, Card, Col, Dropdown, Flex, Row, Typography } from "antd";
+import { Column, Line, Pie } from "@ant-design/charts";
+import { Button, Card, Col, Dropdown, Row, Typography } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
 import { useMemo } from "react";
 import styles from "./DashboardCharts.module.css";
+import cardTheme from "./dashboardCard.module.css";
 
 const CHART_COLORS = [
   "#1677ff",
@@ -19,10 +20,13 @@ const CHART_COLORS = [
 
 type ChartPoint = { month: string; value: number };
 type CategoryPoint = { category: string; value: number };
+type StatPoint = { label: string; value: number };
 
 type DashboardChartsProps = {
   monthlySales: ChartPoint[];
   categoryDistribution: CategoryPoint[];
+  contractStats: StatPoint[];
+  settlementStats: StatPoint[];
 };
 
 function formatSalesAmount(value: number) {
@@ -32,9 +36,84 @@ function formatSalesAmount(value: number) {
   return `₩${value.toLocaleString("ko-KR")}`;
 }
 
+function buildColumnConfig(data: StatPoint[], color: string) {
+  const maxValue = Math.max(...data.map((item) => item.value), 1);
+
+  return {
+    data,
+    xField: "label",
+    yField: "value",
+    height: 108,
+    autoFit: true,
+    paddingTop: 12,
+    paddingBottom: 28,
+    style: { fill: color, radiusTopLeft: 4, radiusTopRight: 4 },
+    axis: {
+      x: { title: false },
+      y: { title: false, grid: true, gridLineDash: [4, 4] },
+    },
+    scale: {
+      y: { domain: [0, maxValue], nice: true },
+    },
+    label: {
+      text: (datum: { value: number }) => (datum.value > 0 ? `${datum.value}` : ""),
+      position: "top" as const,
+      style: { fill: "rgba(0,0,0,0.65)", fontSize: 11 },
+    },
+    tooltip: {
+      items: [{ field: "value", name: "건수", valueFormatter: (v: number) => `${v}건` }],
+    },
+  };
+}
+
+function ContractSettlementCard({
+  contractStats,
+  settlementStats,
+}: {
+  contractStats: StatPoint[];
+  settlementStats: StatPoint[];
+}) {
+  const contractColumnConfig = useMemo(
+    () => buildColumnConfig(contractStats, "#1677ff"),
+    [contractStats],
+  );
+  const settlementColumnConfig = useMemo(
+    () => buildColumnConfig(settlementStats, "#52c41a"),
+    [settlementStats],
+  );
+
+  return (
+    <Card
+      className={`${cardTheme.dashboardCardHead} ${styles.chartCard}`}
+      title="계약 · 정산 현황"
+      styles={{ body: { padding: "16px 24px 12px" } }}
+    >
+      <Typography.Text type="secondary" className={styles.chartBodyLead}>
+        미처리 건 빠른 확인
+      </Typography.Text>
+      <div className={styles.dualMiniChart}>
+        <div>
+          <Typography.Text type="secondary" className={styles.miniChartLabel}>
+            계약
+          </Typography.Text>
+          <Column {...contractColumnConfig} />
+        </div>
+        <div>
+          <Typography.Text type="secondary" className={styles.miniChartLabel}>
+            정산
+          </Typography.Text>
+          <Column {...settlementColumnConfig} />
+        </div>
+      </div>
+    </Card>
+  );
+}
+
 export default function DashboardCharts({
   monthlySales,
   categoryDistribution,
+  contractStats,
+  settlementStats,
 }: DashboardChartsProps) {
   const salesData = monthlySales.length > 0 ? monthlySales : [{ month: "1월", value: 0 }];
   const salesTotal = useMemo(
@@ -58,7 +137,7 @@ export default function DashboardCharts({
       data: salesData,
       xField: "month",
       yField: "value",
-      height: 280,
+      height: 260,
       autoFit: true,
       paddingLeft: 48,
       paddingRight: 16,
@@ -87,7 +166,7 @@ export default function DashboardCharts({
       data: categoryData,
       angleField: "value",
       colorField: "category",
-      height: 280,
+      height: 260,
       autoFit: true,
       innerRadius: 0.62,
       legend: false,
@@ -106,18 +185,15 @@ export default function DashboardCharts({
 
   return (
     <Row gutter={[16, 16]} className={styles.chartRow}>
-      <Col xs={24} lg={16}>
-        <Card className={styles.chartCard} styles={{ body: { padding: "20px 24px 8px" } }}>
-          <Flex justify="space-between" align="flex-start" className={styles.chartCardHead}>
-            <div>
-              <Typography.Text type="secondary" className={styles.chartCardSubtitle}>
-                월별 매출
-              </Typography.Text>
-              <Typography.Title level={3} className={styles.chartCardValue}>
-                {formatSalesAmount(salesTotal)}
-              </Typography.Title>
-            </div>
-          </Flex>
+      <Col xs={24} lg={8}>
+        <Card
+          className={`${cardTheme.dashboardCardHead} ${styles.chartCard}`}
+          title="월별 매출"
+          styles={{ body: { padding: "16px 24px 8px" } }}
+        >
+          <Typography.Title level={3} className={styles.chartCardValue}>
+            {formatSalesAmount(salesTotal)}
+          </Typography.Title>
 
           <div className={styles.chartAreaWrap}>
             <Line {...lineConfig} />
@@ -126,17 +202,10 @@ export default function DashboardCharts({
       </Col>
 
       <Col xs={24} lg={8}>
-        <Card className={styles.chartCard} styles={{ body: { padding: "20px 24px 8px" } }}>
-          <Flex justify="space-between" align="flex-start" className={styles.chartCardHead}>
-            <div>
-              <Typography.Text type="secondary" className={styles.chartCardSubtitle}>
-                카테고리 분포
-              </Typography.Text>
-              <Typography.Title level={5} className={styles.chartCardTitle}>
-                이번 분기 프로젝트
-              </Typography.Title>
-            </div>
-
+        <Card
+          className={`${cardTheme.dashboardCardHead} ${styles.chartCard}`}
+          title="카테고리 분포"
+          extra={
             <Dropdown
               menu={{
                 items: [
@@ -148,7 +217,12 @@ export default function DashboardCharts({
             >
               <Button type="text" icon={<EllipsisOutlined />} className={styles.chartMenuButton} />
             </Dropdown>
-          </Flex>
+          }
+          styles={{ body: { padding: "16px 24px 8px" } }}
+        >
+          <Typography.Text type="secondary" className={styles.chartBodyLead}>
+            이번 분기 프로젝트
+          </Typography.Text>
 
           <div className={styles.chartPieWrap}>
             {categoryData.length > 0 ? (
@@ -182,6 +256,10 @@ export default function DashboardCharts({
             )}
           </div>
         </Card>
+      </Col>
+
+      <Col xs={24} lg={8}>
+        <ContractSettlementCard contractStats={contractStats} settlementStats={settlementStats} />
       </Col>
     </Row>
   );
