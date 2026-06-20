@@ -1,0 +1,492 @@
+.page {
+  width: 100%;
+}
+
+.header {
+  margin-bottom: 16px;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.metaLeft {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.metaSlug {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.metaDivider {
+  color: rgba(0, 0, 0, 0.25);
+}
+
+.infoRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.infoItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.progressWrap {
+  margin-bottom: 4px;
+}
+
+.contentRow {
+  margin-bottom: 16px;
+}
+
+.memoCard {
+  margin-top: 16px;
+}
+
+.mapHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.mapTitle {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.liveBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.liveDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #52c41a;
+}
+
+.mapPlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 280px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #f5f5f5 0%, #fafafa 100%);
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 13px;
+}
+
+.mapOverlay {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.statRow {
+  margin-top: 16px;
+}
+
+.statIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 18px;
+}
+
+.statIconBlue {
+  background: #e6f4ff;
+  color: #1677ff;
+}
+
+.statIconGreen {
+  background: #f6ffed;
+  color: #52c41a;
+}
+
+.statIconOrange {
+  background: #fff7e6;
+  color: #fa8c16;
+}
+
+.emptyTab {
+  padding: 48px 0;
+}
+
+.crewSummary {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+.crewMemberCard {
+  margin-bottom: 16px;
+}
+
+.crewMemberRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.crewMemberInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.crewMemberName {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.crewMemberMeta {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.crewRating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.crewRatingStar {
+  color: #faad14;
+}
+
+.placementSummary {
+  margin-bottom: 16px;
+}
+
+.placementSummaryTitle {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.placementSummaryDesc {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.zoneCard {
+  margin-bottom: 16px;
+}
+
+.zoneHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.zoneDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1677ff;
+}
+
+.zoneTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.zoneMemberRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid #f0f0f0;
+}
+
+.zoneMemberLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.zoneMemberCount {
+  font-size: 13px;
+  font-weight: 500;
+  color: #52c41a;
+  white-space: nowrap;
+}
+
+.applicantHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.applicantSummaryTitle {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.applicantSummaryDesc {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.applicantCard {
+  margin-bottom: 16px;
+}
+
+.applicantRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.applicantLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.applicantStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.statusDotGreen {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #52c41a;
+}
+
+.statusDotGrey {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.statusDotRed {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff4d4f;
+}
+
+.statCardBody {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.statCardContent {
+  min-width: 0;
+}
+
+.statCardLabel {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.statCardValue {
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.statCardSub {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.miniStatRow {
+  margin-bottom: 16px;
+}
+
+.attendanceCard {
+  height: 100%;
+}
+
+.attendanceCardBody {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.attendanceValue {
+  margin-top: 4px;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.miniStatValue {
+  margin-top: 4px;
+  font-size: 24px;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.miniStatBlue {
+  color: #1677ff;
+}
+
+.miniStatGreen {
+  color: #52c41a;
+}
+
+.miniStatOrange {
+  color: #fa8c16;
+}
+
+.miniStatRed {
+  color: #ff4d4f;
+}
+
+.segmentedFilter {
+  margin-bottom: 16px;
+}
+
+.sectionCard {
+  margin-bottom: 16px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.sectionSub {
+  font-size: 12px;
+}
+
+.sectionLabel {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.mapTag {
+  margin-top: 12px;
+}
+
+.scheduleHeader {
+  margin-bottom: 16px;
+}
+
+.listCard {
+  margin-bottom: 12px;
+}
+
+.listCardRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.listCardLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.listIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  font-size: 18px;
+}
+
+.listIconBlue {
+  background: #e6f4ff;
+  color: #1677ff;
+}
+
+.listCardSub {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+}
+
+.educationItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.educationInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.emptyPanel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 992px) {
+  .metaRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

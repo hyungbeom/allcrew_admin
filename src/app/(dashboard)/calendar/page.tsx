@@ -1,5 +1,5 @@
-import PagePlaceholder from "@/components/pages/PagePlaceholder";
+import CalendarPage from "@/components/calendar/CalendarPage";
 
-export default function CalendarPage() {
-  return <PagePlaceholder title="캘린더" />;
+export default function Page() {
+  return <CalendarPage />;
 }

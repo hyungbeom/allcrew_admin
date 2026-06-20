@@ -1,5 +1,5 @@
-import PagePlaceholder from "@/components/pages/PagePlaceholder";
+import SettlementPage from "@/components/settlement/SettlementPage";
 
-export default function SettlementPage() {
-  return <PagePlaceholder title="정산" />;
+export default function Page() {
+  return <SettlementPage />;
 }

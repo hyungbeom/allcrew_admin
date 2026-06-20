@@ -1,5 +1,5 @@
-import PagePlaceholder from "@/components/pages/PagePlaceholder";
+import EducationPage from "@/components/education/EducationPage";
 
-export default function EducationPage() {
-  return <PagePlaceholder title="안전교육" />;
+export default function Page() {
+  return <EducationPage />;
 }

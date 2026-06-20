@@ -1,5 +1,5 @@
-import PagePlaceholder from "@/components/pages/PagePlaceholder";
+import ContractPage from "@/components/contract/ContractPage";
 
-export default function ContractPage() {
-  return <PagePlaceholder title="계약" />;
+export default function Page() {
+  return <ContractPage />;
 }

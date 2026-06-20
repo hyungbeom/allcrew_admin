@@ -5,12 +5,15 @@
 .equalCard {
   flex: 1;
   width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
 
 .equalCard :global(.ant-card-body) {
   flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .attendanceCard :global(.ant-card-body) {
@@ -49,6 +52,11 @@
 
 .attendanceStatsRow {
   margin-top: auto;
+}
+
+.topPanelRow {
+  align-items: stretch;
+  margin-bottom: 20px;
 }
 
 .statCol {
@@ -100,10 +108,48 @@
 
 .taskCard {
   width: 100%;
+  border: 1px solid #f0f0f0;
+  box-shadow: none;
 }
 
-.taskCard :global(.ant-statistic-content) {
+.taskCardHead {
+  margin-bottom: 4px;
+}
+
+.taskCardInfoIcon {
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 14px;
+  cursor: help;
+}
+
+.taskCardValue {
+  margin: 0 0 8px !important;
+  font-size: 30px !important;
+  line-height: 1.2 !important;
+  font-weight: 600 !important;
   font-variant-numeric: tabular-nums;
+}
+
+.taskChartArea {
+  height: 46px;
+  overflow: hidden;
+}
+
+.taskChartArea :global(.ant-progress) {
+  margin: 8px 0 0;
+}
+
+.taskCardDivider {
+  margin: 12px 0 !important;
+}
+
+.taskCardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+  font-size: 14px;
 }
 
 .siteCard :global(.ant-card-body) {
@@ -116,18 +162,42 @@
   gap: 12px;
   flex: 1;
   padding: 4px 0;
+  min-height: 0;
 }
 
-.siteHeaderButton {
-  height: 32px;
-  padding-inline: 12px;
-  font-size: 13px;
+.siteHeaderTag {
+  margin: 0;
+  padding: 4px 12px;
+  border: none;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.siteHeaderTagContent {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.siteHeaderTag:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.siteHeaderTagContent :global(.anticon) {
+  font-size: 11px;
 }
 
 .siteItem {
   display: flex;
+  flex: 1;
   align-items: center;
   justify-content: space-between;
+  min-height: 72px;
   padding: 14px 16px;
   border-radius: 8px;
   background: #fafafa;
@@ -150,4 +220,75 @@
   font-size: 20px !important;
   line-height: 1 !important;
   color: rgba(0, 0, 0, 0.88);
+}
+
+.bottomPanelRow {
+  align-items: stretch;
+  margin-bottom: 20px;
+}
+
+.bottomPanelCol {
+  display: flex;
+}
+
+.bottomPanelCard {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.bottomPanelCard :global(.ant-card-body) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.activityCard :global(.ant-card-body) {
+  padding-top: 0 !important;
+}
+
+.bottomPanelBody {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 260px;
+}
+
+.activityList {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 260px;
+  height: 100%;
+}
+
+.activityItem {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  min-height: 52px;
+  padding: 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.activityItem:last-child {
+  border-bottom: none;
+}
+
+.activityText {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.activityDate {
+  flex-shrink: 0;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.45);
 }

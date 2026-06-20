@@ -1,0 +1,126 @@
+.page {
+  width: 100%;
+}
+
+.pageTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.45);
+  line-height: 1.6;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.projectSelect {
+  min-width: 200px;
+}
+
+.toolbarRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-end;
+}
+
+.searchInput {
+  max-width: 280px;
+}
+
+.tableCard {
+  border-radius: 8px;
+}
+
+.tableCard :global(.ant-table-thead > tr > th) {
+  background: #fafafa !important;
+  font-weight: 500;
+}
+
+.crewCell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.crewInfo {
+  min-width: 0;
+}
+
+.crewName {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+  line-height: 1.4;
+}
+
+.crewPhone {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+  line-height: 1.4;
+}
+
+.roleTag {
+  margin: 0;
+}
+
+.ratingCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.ratingStar {
+  color: #faad14;
+  font-size: 14px;
+}
+
+.actionCell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+@media (max-width: 992px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbarRight {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .searchInput {
+    max-width: none;
+    flex: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .pageTop {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

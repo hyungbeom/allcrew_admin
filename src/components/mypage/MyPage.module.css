@@ -1,0 +1,320 @@
+.page {
+  width: 100%;
+}
+
+.pageHeader {
+  margin-bottom: 16px;
+}
+
+.pageTitle {
+  margin: 0 0 6px !important;
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+}
+
+.pageSubtitle {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.layout {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  width: 100%;
+}
+
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+}
+
+.sidebarNav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(0, 0, 0, 0.65);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.menuItem:hover {
+  background: #fafafa;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.menuItemActive {
+  background: #e6f4ff;
+  color: #1677ff;
+  font-weight: 500;
+}
+
+.menuItemActive:hover {
+  background: #e6f4ff;
+  color: #1677ff;
+}
+
+.contentCard {
+  flex: 1;
+  min-width: 0;
+}
+
+.sectionTitle {
+  margin: 0 0 16px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+}
+
+.logoSection {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.logoPreview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  border: 1px solid #f0f0f0;
+  background: #fff;
+  overflow: hidden;
+}
+
+.logoImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.logoActions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.logoHint {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 16px;
+}
+
+.formGridFull {
+  grid-column: 1 / -1;
+}
+
+.addressCompact {
+  width: 100%;
+}
+
+.addressCompact :global(.ant-input-affix-wrapper) {
+  flex: 1;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-start;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.sectionHeader .sectionTitle {
+  margin-bottom: 0 !important;
+}
+
+.teamTable :global(.ant-table-thead > tr > th) {
+  background: #fafafa !important;
+  font-weight: 500;
+}
+
+.emptyWrap {
+  padding: 32px 0;
+}
+
+.notificationList {
+  display: flex;
+  flex-direction: column;
+}
+
+.notificationItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.notificationItem:last-child {
+  border-bottom: none;
+}
+
+.notificationTitle {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.notificationDesc {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+  line-height: 1.5;
+}
+
+.planBox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  border: 1px solid #91caff;
+  border-radius: 8px;
+  background: #f0f7ff;
+}
+
+.planInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.planIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #1677ff;
+  color: #fff;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.planName {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.planDesc {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.planPricing {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.planPrice {
+  font-size: 18px;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.88);
+  white-space: nowrap;
+}
+
+.paymentRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0 0;
+}
+
+.paymentInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.visaBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: #1a1f71;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.paymentText {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.paymentExpiry {
+  margin-left: 8px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+@media (max-width: 992px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .planBox {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .planPricing {
+    align-items: flex-start;
+    width: 100%;
+  }
+}

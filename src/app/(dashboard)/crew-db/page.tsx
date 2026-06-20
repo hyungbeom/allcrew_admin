@@ -1,5 +1,5 @@
-import PagePlaceholder from "@/components/pages/PagePlaceholder";
+import CrewDbPage from "@/components/crew-db/CrewDbPage";
 
-export default function CrewDbPage() {
-  return <PagePlaceholder title="크루 DB" />;
+export default function Page() {
+  return <CrewDbPage />;
 }

@@ -1,5 +1,5 @@
-import PagePlaceholder from "@/components/pages/PagePlaceholder";
+import SafenetPage from "@/components/safenet/SafenetPage";
 
-export default function SafenetPage() {
-  return <PagePlaceholder title="세이프넷" />;
+export default function Page() {
+  return <SafenetPage />;
 }

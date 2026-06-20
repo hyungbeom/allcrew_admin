@@ -1,5 +1,5 @@
-import PagePlaceholder from "@/components/pages/PagePlaceholder";
+import StatisticsPage from "@/components/statistics/StatisticsPage";
 
-export default function StatisticsPage() {
-  return <PagePlaceholder title="통계/리포트" />;
+export default function Page() {
+  return <StatisticsPage />;
 }

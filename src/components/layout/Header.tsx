@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { Avatar, Badge, Dropdown, Layout } from "antd";
 import type { MenuProps } from "antd";
-import { BellOutlined, LogoutOutlined, SettingOutlined, SkinOutlined } from "@ant-design/icons";
+import { BellOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import NotificationDrawer from "./NotificationDrawer";
 import styles from "./Header.module.css";
 
@@ -15,14 +16,9 @@ const AVATAR_URL =
 
 const userMenuItems: MenuProps["items"] = [
   {
-    key: "settings",
-    icon: <SettingOutlined />,
-    label: "个人设置",
-  },
-  {
-    key: "theme",
-    icon: <SkinOutlined />,
-    label: "主题设置",
+    key: "mypage",
+    icon: <UserOutlined />,
+    label: "마이페이지",
   },
   {
     type: "divider",
@@ -30,17 +26,24 @@ const userMenuItems: MenuProps["items"] = [
   {
     key: "logout",
     icon: <LogoutOutlined />,
-    label: "退出登录",
+    label: "로그아웃",
   },
 ];
 
 export default function Header() {
+  const router = useRouter();
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(25);
 
   const handleUnreadCountChange = useCallback((count: number) => {
     setUnreadCount(count);
   }, []);
+
+  const handleUserMenuClick: MenuProps["onClick"] = ({ key }) => {
+    if (key === "mypage") {
+      router.push("/mypage");
+    }
+  };
 
   return (
     <AntHeader className={styles.header}>
@@ -77,7 +80,11 @@ export default function Header() {
           onUnreadCountChange={handleUnreadCountChange}
         />
 
-        <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" trigger={["click"]}>
+        <Dropdown
+          menu={{ items: userMenuItems, onClick: handleUserMenuClick }}
+          placement="bottomRight"
+          trigger={["click"]}
+        >
           <div className={styles.userTrigger}>
             <Avatar size={24} src={AVATAR_URL} />
             <span className={styles.userName}>ProUser</span>

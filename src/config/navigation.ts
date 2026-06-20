@@ -1,3 +1,5 @@
+import { getProjectById } from "@/components/project/projectData";
+
 export type NavLeaf = {
   path: string;
   label: string;
@@ -51,6 +53,14 @@ export const navGroups: NavGroup[] = [
 export const navLeaves = navGroups.flatMap((group) => group.children);
 
 export function getPageTitle(pathname: string): string {
+  if (pathname === "/mypage") return "회사 설정";
+
+  const projectDetailMatch = pathname.match(/^\/project\/([^/]+)$/);
+  if (projectDetailMatch) {
+    const project = getProjectById(projectDetailMatch[1]);
+    return project?.name ?? "프로젝트";
+  }
+
   return navLeaves.find((item) => item.path === pathname)?.title ?? "ALLCREW";
 }
 
@@ -64,6 +74,25 @@ export type BreadcrumbItem = {
 };
 
 export function getBreadcrumb(pathname: string): BreadcrumbItem[] {
+  if (pathname === "/mypage") {
+    return [
+      { label: "ALLCREW", href: "/dashboard" },
+      { label: "마이페이지" },
+    ];
+  }
+
+  const projectDetailMatch = pathname.match(/^\/project\/([^/]+)$/);
+  if (projectDetailMatch) {
+    const project = getProjectById(projectDetailMatch[1]);
+    const operationGroup = navGroups.find((g) => g.key === "operation");
+    return [
+      { label: "ALLCREW", href: "/dashboard" },
+      { label: operationGroup?.label ?? "운영현황" },
+      { label: "프로젝트", href: "/project" },
+      { label: project?.name ?? projectDetailMatch[1] },
+    ];
+  }
+
   const group = navGroups.find((g) => g.children.some((child) => child.path === pathname));
   const leaf = navLeaves.find((item) => item.path === pathname);
 

@@ -1,0 +1,262 @@
+.page {
+  width: 100%;
+}
+
+.pageTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.45);
+  line-height: 1.6;
+}
+
+.workflowRow {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.workflowCard {
+  border-radius: 8px;
+}
+
+.workflowCard :global(.ant-card-body) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.workflowLabel {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.workflowValue {
+  font-size: 24px;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.workflowIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.workflowIconBlue {
+  background: #e6f4ff;
+  color: #1677ff;
+}
+
+.workflowIconRed {
+  background: #fff1f0;
+  color: #ff4d4f;
+}
+
+.workflowIconOrange {
+  background: #fff7e6;
+  color: #fa8c16;
+}
+
+.workflowIconGreen {
+  background: #f6ffed;
+  color: #52c41a;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 16px;
+}
+
+.leftPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.projectSelect {
+  min-width: 180px;
+}
+
+.statusTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.statusTab {
+  height: 32px;
+  padding: 0 14px;
+  border: 1px solid #d9d9d9;
+  border-radius: 999px;
+  background: #fff;
+  color: rgba(0, 0, 0, 0.65);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.statusTabActive {
+  border-color: #141414;
+  background: #141414;
+  color: #fff;
+}
+
+.listCard,
+.sideCard {
+  border-radius: 8px;
+}
+
+.listHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.listTitle {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.listMeta {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.incidentCard {
+  padding: 14px 16px;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.incidentCardActive {
+  border-color: #91caff;
+  background: #f0f7ff;
+}
+
+.incidentTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.incidentTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.statusDotGreen {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #52c41a;
+}
+
+.incidentMeta {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+  line-height: 1.6;
+}
+
+.mapCard {
+  margin-bottom: 16px;
+}
+
+.mapHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.mapTitle {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.mapStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.mapPlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 220px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #f5f5f5 0%, #fafafa 100%);
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 13px;
+}
+
+.actionStack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.actionTitle {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+@media (max-width: 1200px) {
+  .workflowRow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .pageTop {
+    flex-direction: column;
+  }
+
+  .workflowRow {
+    grid-template-columns: 1fr;
+  }
+}

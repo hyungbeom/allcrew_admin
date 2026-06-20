@@ -1,0 +1,236 @@
+.page {
+  width: 100%;
+}
+
+.pageTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.45);
+  line-height: 1.6;
+}
+
+.statRow {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.statCard :global(.ant-card-body) {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.statLabel {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.statValue {
+  display: block;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.statUnit {
+  margin-left: 2px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.statSub {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.statIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 18px;
+}
+
+.statIconBlue {
+  background: #e6f4ff;
+  color: #1677ff;
+}
+
+.statIconGreen {
+  background: #f6ffed;
+  color: #52c41a;
+}
+
+.statIconGrey {
+  background: #fafafa;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.statIconOrange {
+  background: #fff7e6;
+  color: #fa8c16;
+}
+
+.filterRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.periodRange {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+  white-space: nowrap;
+}
+
+.chartRow {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.chartCard {
+  border-radius: 8px;
+}
+
+.chartTitle {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.chartSubtitle {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.bottomRow {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  gap: 16px;
+}
+
+.panelCard {
+  border-radius: 8px;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.panelTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.panelLink {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.panelLink:hover {
+  color: #1677ff;
+}
+
+.panelCount {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.rankCell {
+  width: 32px;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.45);
+  text-align: center;
+}
+
+.crewCell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.crewName {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.crewRole {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.ratingCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.ratingStar {
+  color: #faad14;
+}
+
+.tableCard :global(.ant-table-thead > tr > th) {
+  background: #fafafa !important;
+  font-weight: 500;
+}
+
+.emptyWrap {
+  padding: 48px 0;
+}
+
+@media (max-width: 1200px) {
+  .statRow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .chartRow,
+  .bottomRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .statRow {
+    grid-template-columns: 1fr;
+  }
+
+  .pageTop,
+  .filterRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

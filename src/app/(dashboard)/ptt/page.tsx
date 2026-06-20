@@ -1,5 +1,5 @@
-import PagePlaceholder from "@/components/pages/PagePlaceholder";
+import PttPage from "@/components/ptt/PttPage";
 
-export default function PttPage() {
-  return <PagePlaceholder title="하이브리드 PTT" />;
+export default function Page() {
+  return <PttPage />;
 }

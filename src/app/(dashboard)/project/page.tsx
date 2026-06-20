@@ -1,5 +1,5 @@
-import PagePlaceholder from "@/components/pages/PagePlaceholder";
+import ProjectPage from "@/components/project/ProjectPage";
 
-export default function ProjectPage() {
-  return <PagePlaceholder title="프로젝트" />;
+export default function Page() {
+  return <ProjectPage />;
 }

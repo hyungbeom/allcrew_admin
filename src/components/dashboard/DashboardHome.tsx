@@ -1,8 +1,8 @@
 "use client";
 
+import { Tiny } from "@ant-design/charts";
 import {
   Avatar,
-  Badge,
   Button,
   Card,
   Col,
@@ -12,23 +12,21 @@ import {
   Progress,
   Row,
   Space,
-  Statistic,
   Tag,
+  Tooltip,
   Typography,
 } from "antd";
 import type { ProgressProps } from "antd";
 import {
   ArrowRightOutlined,
-  BankOutlined,
-  ClockCircleOutlined,
   EnvironmentOutlined,
+  InfoCircleOutlined,
   ProjectOutlined,
-  SafetyOutlined,
   TeamOutlined,
-  UserAddOutlined,
-  UserOutlined,
 } from "@ant-design/icons";
 import styles from "./DashboardHome.module.css";
+import DashboardCharts from "./DashboardChartsLazy";
+import { toSparklineData } from "./chartUtils";
 
 const TOTAL_COUNT = 48;
 const ATTENDANCE_COUNT = 42;
@@ -49,58 +47,130 @@ const attendanceStats = [
   },
 ];
 
-const tasks = [
+const UNVERIFIED_APPLICANTS = 8;
+const VERIFIED_APPLICANTS = 24;
+const TOTAL_APPLICANTS = UNVERIFIED_APPLICANTS + VERIFIED_APPLICANTS;
+
+const recruitingSparkline = [2, 3, 4, 3, 5, 6, 5, 7, 8, 6, 7, 9, 8, 7, 6, 8, 6];
+
+type TaskCard = {
+  key: string;
+  label: string;
+  value: string;
+  tooltip: string;
+  footerLabel: string;
+  footerValue: string;
+  variant: "area" | "progress" | "applicants";
+  sparkline?: number[];
+  progress?: number;
+  verifiedCount?: number;
+  unverifiedCount?: number;
+};
+
+const tasks: TaskCard[] = [
   {
     key: "applicants",
-    icon: <UserAddOutlined />,
-    iconColor: "#fa8c16",
-    iconBg: "#fff7e6",
-    badge: "확인 필요",
-    badgeColor: "warning",
     label: "미확인 지원자",
-    value: "2명",
-    status: "승인 대기",
-    link: "승인 화면",
+    value: `${UNVERIFIED_APPLICANTS}명`,
+    tooltip: `확인 지원자 ${VERIFIED_APPLICANTS}명, 미확인 지원자 ${UNVERIFIED_APPLICANTS}명 (전체 ${TOTAL_APPLICANTS}명)`,
+    variant: "applicants",
+    unverifiedCount: UNVERIFIED_APPLICANTS,
+    verifiedCount: VERIFIED_APPLICANTS,
+    footerLabel: "확인 지원자",
+    footerValue: `${VERIFIED_APPLICANTS}명`,
   },
   {
     key: "recruiting",
-    icon: <ProjectOutlined />,
-    iconColor: "#1677ff",
-    iconBg: "#e6f4ff",
     label: "모집 중 프로젝트",
-    value: "0건",
-    status: "진행 중",
-    link: "보러가기",
+    value: "6건",
+    tooltip: "현재 모집 중인 프로젝트 수입니다.",
+    variant: "area",
+    sparkline: recruitingSparkline,
+    footerLabel: "진행 중",
+    footerValue: "6건",
   },
   {
     key: "settlement",
-    icon: <BankOutlined />,
-    iconColor: "#722ed1",
-    iconBg: "#f9f0ff",
     label: "정산 대기",
-    value: "0건",
-    status: "처리 필요",
-    link: "정산 관리",
+    value: "12건",
+    tooltip: "처리가 필요한 정산 건수입니다.",
+    variant: "progress",
+    progress: 68,
+    footerLabel: "전환율",
+    footerValue: "68%",
   },
   {
     key: "education",
-    icon: <SafetyOutlined />,
-    iconColor: "#52c41a",
-    iconBg: "#f6ffed",
     label: "교육 만료 예정",
-    value: "0명",
-    status: "30일 이내",
-    link: "크루 확인",
+    value: "14명",
+    tooltip: "30일 이내 교육 만료 예정 크루 수입니다.",
+    variant: "progress",
+    progress: 78,
+    footerLabel: "30일 이내",
+    footerValue: "14명",
   },
 ];
 
+function TaskCardContent({ task }: { task: TaskCard }) {
+  if (task.variant === "applicants" && task.unverifiedCount !== undefined && task.verifiedCount !== undefined) {
+    const totalApplicants = task.unverifiedCount + task.verifiedCount;
+    const unverifiedPercent = Math.round((task.unverifiedCount / totalApplicants) * 100);
+
+    return (
+      <div className={styles.taskChartArea}>
+        <Progress
+          percent={unverifiedPercent}
+          strokeColor={attendanceProgressColors}
+          status="active"
+          showInfo
+        />
+      </div>
+    );
+  }
+
+  if (task.variant === "area" && task.sparkline) {
+    return (
+      <div className={styles.taskChartArea}>
+        <Tiny.Area
+          height={46}
+          autoFit
+          data={toSparklineData(task.sparkline)}
+          xField="index"
+          yField="value"
+          style={{
+            fill: "linear-gradient(-90deg, white 0%, #975FE4 100%)",
+            fillOpacity: 0.6,
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (task.variant === "progress" && task.progress !== undefined) {
+    return (
+      <div className={styles.taskChartArea}>
+        <Progress
+          percent={task.progress}
+          strokeColor={attendanceProgressColors}
+          status="active"
+          showInfo
+        />
+      </div>
+    );
+  }
+
+  return null;
+}
+
 const activities = [
-  { text: "박서준님이 박서준님 정산 지급 완료", time: "1일 전" },
-  { text: "이민호님이 이민호님 정산 지급 완료", time: "1일 전" },
-  { text: "최유진님이 최유진님 정산 지급 완료", time: "1일 전" },
-  { text: "김지훈님이 김지훈님 정산 지급 완료", time: "2일 전" },
-  { text: "정수아님이 정수아님 정산 지급 완료", time: "2일 전" },
+  { text: "박서준님 정산 지급 완료", date: "2026-06-19" },
+  { text: "이민호님 정산 지급 완료", date: "2026-06-17" },
+  { text: "최유진님 정산 지급 완료", date: "2026-06-17" },
+  { text: "김지훈님 교육 이수 완료", date: "2026-06-16" },
+  { text: "정수아님 프로젝트 배정 완료", date: "2026-06-15" },
 ];
+
+const MAX_ACTIVITY_ITEMS = 5;
 
 const siteStats = [
   { label: "진행중인 현장", value: 3, icon: <ProjectOutlined /> },
@@ -111,7 +181,7 @@ const siteStats = [
 export default function DashboardHome() {
   return (
     <>
-      <Row gutter={[16, 16]} align="stretch" style={{ marginBottom: 20 }}>
+      <Row gutter={[16, 16]} align="stretch" className={styles.topPanelRow}>
         <Col xs={24} lg={14} className={styles.equalCol}>
           <Card
             className={`${styles.equalCard} ${styles.attendanceCard}`}
@@ -175,15 +245,12 @@ export default function DashboardHome() {
             className={`${styles.equalCard} ${styles.siteCard}`}
             title="현장 관리"
             extra={
-              <Button
-                type="primary"
-                size="small"
-                icon={<ArrowRightOutlined />}
-                iconPlacement="end"
-                className={styles.siteHeaderButton}
-              >
-                세이프넷 관제센터 열기
-              </Button>
+              <Tag variant="filled" color="processing" className={styles.siteHeaderTag}>
+                <span className={styles.siteHeaderTagContent}>
+                  세이프넷 관제센터 열기
+                  <ArrowRightOutlined />
+                </span>
+              </Tag>
             }
             styles={{ body: { display: "flex", flexDirection: "column", flex: 1 } }}
           >
@@ -218,55 +285,39 @@ export default function DashboardHome() {
         style={{ marginBottom: 20 }}
         styles={{ body: { padding: "20px 24px 24px" } }}
       >
-        <Row gutter={[16, 16]}>
+        <Row gutter={[24, 24]}>
           {tasks.map((task) => (
             <Col xs={24} sm={12} xl={6} key={task.key} className={styles.taskCol}>
-              <Card
-                hoverable
-                className={styles.taskCard}
-                styles={{ body: { padding: 20, height: "100%", display: "flex", flexDirection: "column" } }}
-              >
-                <Flex justify="space-between" align="flex-start" style={{ marginBottom: 16 }}>
-                  <Avatar
-                    size={40}
-                    icon={task.icon}
-                    style={{ backgroundColor: task.iconBg, color: task.iconColor }}
-                  />
-                  {task.badge && (
-                    <Tag variant="filled" color={task.badgeColor} style={{ margin: 0 }}>
-                      {task.badge}
-                    </Tag>
-                  )}
+              <Card className={styles.taskCard} styles={{ body: { padding: "20px 24px 8px" } }}>
+                <Flex justify="space-between" align="center" className={styles.taskCardHead}>
+                  <Typography.Text type="secondary">{task.label}</Typography.Text>
+                  <Tooltip title={task.tooltip}>
+                    <InfoCircleOutlined className={styles.taskCardInfoIcon} />
+                  </Tooltip>
                 </Flex>
 
-                <Statistic
-                  title={<Typography.Text type="secondary">{task.label}</Typography.Text>}
-                  value={task.value}
-                  styles={{
-                    title: { marginBottom: 4 },
-                    content: { fontSize: 28, fontWeight: 600, lineHeight: 1.2 },
-                  }}
-                />
+                <Typography.Title level={3} className={styles.taskCardValue}>
+                  {task.value}
+                </Typography.Title>
 
-                <Divider style={{ margin: "16px 0 12px" }} />
+                <TaskCardContent task={task} />
 
-                <Flex justify="space-between" align="center" style={{ marginTop: "auto" }}>
-                  <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-                    {task.status}
-                  </Typography.Text>
-                  <Button type="link" size="small" style={{ padding: 0, height: "auto" }} icon={<ArrowRightOutlined />} iconPlacement="end">
-                    {task.link}
-                  </Button>
-                </Flex>
+                <Divider className={styles.taskCardDivider} />
+
+                <div className={styles.taskCardFooter}>
+                  <Typography.Text type="secondary">{task.footerLabel}</Typography.Text>
+                  <Typography.Text>{task.footerValue}</Typography.Text>
+                </div>
               </Card>
             </Col>
           ))}
         </Row>
       </Card>
 
-      <Row gutter={[16, 16]}>
-        <Col xs={24} xl={15}>
+      <Row gutter={[16, 16]} align="stretch" className={styles.bottomPanelRow}>
+        <Col xs={24} xl={15} className={styles.bottomPanelCol}>
           <Card
+            className={styles.bottomPanelCard}
             title={
               <div>
                 <Typography.Title level={5} style={{ margin: 0 }}>
@@ -282,54 +333,40 @@ export default function DashboardHome() {
                 전체보기
               </Button>
             }
+            styles={{ body: { display: "flex", flexDirection: "column", flex: 1 } }}
           >
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="오늘 진행 중인 프로젝트가 없어요."
-              style={{ padding: "32px 0" }}
-            />
+            <div className={styles.bottomPanelBody}>
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="오늘 진행 중인 프로젝트가 없어요."
+              />
+            </div>
           </Card>
         </Col>
 
-        <Col xs={24} xl={9}>
+        <Col xs={24} xl={9} className={styles.bottomPanelCol}>
           <Card
             title="최근 활동"
-            extra={
-              <Tag variant="filled" color="success" style={{ margin: 0 }}>
-                <Badge status="processing" color="#52c41a" text="실시간" />
-              </Tag>
-            }
-            styles={{ body: { paddingTop: 8 } }}
+            className={`${styles.bottomPanelCard} ${styles.activityCard}`}
+            styles={{ body: { display: "flex", flexDirection: "column", flex: 1, paddingTop: 0 } }}
           >
-            <div>
-              {activities.map((item, index) => (
-                <Flex
-                  key={item.text}
-                  gap={10}
-                  align="flex-start"
-                  style={{
-                    padding: "12px 0",
-                    borderBottom: index < activities.length - 1 ? "1px solid #f0f0f0" : undefined,
-                  }}
-                >
-                  <Avatar icon={<UserOutlined />} style={{ backgroundColor: "#e6f4ff", color: "#1677ff", flexShrink: 0 }} />
-                  <div style={{ minWidth: 0 }}>
-                    <Typography.Text style={{ fontSize: 13, display: "block", marginBottom: 3 }}>
-                      {item.text}
-                    </Typography.Text>
-                    <Space size={4}>
-                      <ClockCircleOutlined style={{ fontSize: 11, color: "rgba(0,0,0,0.25)" }} />
-                      <Typography.Text type="secondary" style={{ fontSize: 11 }}>
-                        {item.time}
-                      </Typography.Text>
-                    </Space>
-                  </div>
-                </Flex>
+            <div className={styles.activityList}>
+              {activities.slice(0, MAX_ACTIVITY_ITEMS).map((item) => (
+                <div key={`${item.text}-${item.date}`} className={styles.activityItem}>
+                  <Typography.Text ellipsis className={styles.activityText}>
+                    {item.text}
+                  </Typography.Text>
+                  <Typography.Text type="secondary" className={styles.activityDate}>
+                    {item.date}
+                  </Typography.Text>
+                </div>
               ))}
             </div>
           </Card>
         </Col>
       </Row>
+
+      <DashboardCharts />
     </>
   );
 }

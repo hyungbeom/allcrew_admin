@@ -1,5 +1,5 @@
-import PagePlaceholder from "@/components/pages/PagePlaceholder";
+import ChatPage from "@/components/chat/ChatPage";
 
-export default function ChatPage() {
-  return <PagePlaceholder title="채팅" />;
+export default function Page() {
+  return <ChatPage />;
 }

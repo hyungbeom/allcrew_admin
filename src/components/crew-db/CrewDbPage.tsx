@@ -1,0 +1,196 @@
+"use client";
+
+import {
+  DownloadOutlined,
+  FilterOutlined,
+  FolderOutlined,
+  MessageOutlined,
+  RightOutlined,
+  SortAscendingOutlined,
+  StarFilled,
+} from "@ant-design/icons";
+import { Avatar, Button, Card, Input, Select, Table, Tag, Typography, message } from "antd";
+import type { ColumnsType } from "antd/es/table";
+import { useMemo, useState } from "react";
+import {
+  avatarColors,
+  crewMembers,
+  formatRecentWork,
+  maskPhone,
+  projectFilterOptions,
+  type CrewMember,
+} from "./crewData";
+import styles from "./CrewDbPage.module.css";
+
+const PAGE_SIZE = 10;
+
+export default function CrewDbPage() {
+  const [projectFilter, setProjectFilter] = useState("all");
+  const [searchText, setSearchText] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const filteredCrew = useMemo(() => {
+    const keyword = searchText.trim().toLowerCase();
+
+    return crewMembers
+      .filter((crew) => {
+        if (projectFilter !== "all" && !crew.projectIds.includes(projectFilter)) {
+          return false;
+        }
+
+        if (!keyword) {
+          return true;
+        }
+
+        return (
+          crew.name.toLowerCase().includes(keyword) ||
+          crew.phone.replace(/\D/g, "").includes(keyword.replace(/\D/g, ""))
+        );
+      })
+      .sort((a, b) => b.workDays - a.workDays);
+  }, [projectFilter, searchText]);
+
+  const columns: ColumnsType<CrewMember> = [
+    {
+      title: "크루",
+      key: "crew",
+      width: 220,
+      render: (_, record, index) => (
+        <div className={styles.crewCell}>
+          <Avatar size={40} style={{ backgroundColor: avatarColors[index % avatarColors.length] }}>
+            {record.name.slice(-2)}
+          </Avatar>
+          <div className={styles.crewInfo}>
+            <Typography.Text className={styles.crewName}>{record.name}</Typography.Text>
+            <Typography.Text className={styles.crewPhone}>{maskPhone(record.phone)}</Typography.Text>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "주 직무",
+      dataIndex: "role",
+      key: "role",
+      width: 100,
+      render: (value: string) => (
+        <Tag bordered={false} className={styles.roleTag}>
+          {value}
+        </Tag>
+      ),
+    },
+    {
+      title: "누적 프로젝트",
+      dataIndex: "projectCount",
+      key: "projectCount",
+      width: 120,
+      render: (value: number) => `${value}건`,
+    },
+    {
+      title: "누적 근무",
+      dataIndex: "workDays",
+      key: "workDays",
+      width: 100,
+      render: (value: number) => `${value}일`,
+    },
+    {
+      title: "최근 근무",
+      dataIndex: "recentWorkDate",
+      key: "recentWorkDate",
+      width: 120,
+      render: (value: string) => formatRecentWork(value),
+    },
+    {
+      title: "안전교육",
+      dataIndex: "safetyTraining",
+      key: "safetyTraining",
+      width: 100,
+      render: (value: string | null) => value ?? "-",
+    },
+    {
+      title: "평점",
+      dataIndex: "rating",
+      key: "rating",
+      width: 90,
+      render: (value: number) => (
+        <span className={styles.ratingCell}>
+          <StarFilled className={styles.ratingStar} />
+          {value.toFixed(1)}
+        </span>
+      ),
+    },
+    {
+      title: "",
+      key: "actions",
+      width: 88,
+      align: "right",
+      render: () => (
+        <div className={styles.actionCell}>
+          <Button type="text" size="small" icon={<MessageOutlined />} aria-label="메시지 보내기" />
+          <Button type="text" size="small" icon={<RightOutlined />} aria-label="상세 보기" />
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <div className={styles.page}>
+      <div className={styles.pageTop}>
+        <Typography.Text className={styles.subtitle}>
+          프로젝트를 진행하며 쌓인 크루 명단이에요. 실제 근무 이력이 있는 크루 {crewMembers.length}명이
+          등록되어 있어요.
+        </Typography.Text>
+        <Button
+          icon={<DownloadOutlined />}
+          onClick={() => message.info("CSV 내보내기를 준비 중입니다.")}
+        >
+          CSV 내보내기
+        </Button>
+      </div>
+
+      <div className={styles.toolbar}>
+        <Select
+          className={styles.projectSelect}
+          value={projectFilter}
+          options={projectFilterOptions}
+          prefix={<FolderOutlined style={{ color: "rgba(0,0,0,0.45)" }} />}
+          onChange={(value) => {
+            setProjectFilter(value);
+            setCurrentPage(1);
+          }}
+        />
+
+        <div className={styles.toolbarRight}>
+          <Input.Search
+            allowClear
+            className={styles.searchInput}
+            placeholder="이름, 연락처로 검색"
+            value={searchText}
+            onChange={(event) => {
+              setSearchText(event.target.value);
+              setCurrentPage(1);
+            }}
+          />
+          <Button icon={<SortAscendingOutlined />}>근무 많은 순</Button>
+          <Button icon={<FilterOutlined />}>필터</Button>
+        </div>
+      </div>
+
+      <Card className={styles.tableCard} styles={{ body: { padding: 0 } }}>
+        <Table<CrewMember>
+          rowKey="id"
+          columns={columns}
+          dataSource={filteredCrew}
+          scroll={{ x: 960 }}
+          pagination={{
+            current: currentPage,
+            pageSize: PAGE_SIZE,
+            total: filteredCrew.length,
+            showSizeChanger: false,
+            showTotal: (total, range) => `${total}개 중 ${range[0]}-${range[1]} 표시`,
+            onChange: (page) => setCurrentPage(page),
+          }}
+        />
+      </Card>
+    </div>
+  );
+}
