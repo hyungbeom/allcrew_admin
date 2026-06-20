@@ -2,7 +2,8 @@
 
 import { PlusOutlined, SmileOutlined } from "@ant-design/icons";
 import { App, Avatar, Button, Empty, Input, Spin, Typography } from "antd";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { InputRef } from "antd";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { ApiError } from "@/lib/api/client";
 import { fetchChatMessages, sendChatMessage } from "@/lib/api/operations";
 import type { ChatMessage, ChatRoom } from "./chatData";
@@ -20,25 +21,25 @@ export default function ChatConversationPanel({ room, onRoomUpdated }: ChatConve
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const [draft, setDraft] = useState("");
-  const messageListRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const composerRef = useRef<InputRef>(null);
+  const roomId = room?.id ?? null;
 
   const displayMeta = useMemo(() => buildMessageDisplayMeta(messages), [messages]);
 
-  const scrollToBottom = useCallback(() => {
-    const container = messageListRef.current;
-    if (!container) return;
-    container.scrollTop = container.scrollHeight;
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = "auto") => {
+    messagesEndRef.current?.scrollIntoView({ behavior, block: "end" });
   }, []);
 
   const loadMessages = useCallback(async () => {
-    if (!room) {
+    if (!roomId) {
       setMessages([]);
       return;
     }
 
     setLoading(true);
     try {
-      const items = await fetchChatMessages(room.id);
+      const items = await fetchChatMessages(roomId);
       setMessages(items);
     } catch (error) {
       const errorMessage =
@@ -48,17 +49,45 @@ export default function ChatConversationPanel({ room, onRoomUpdated }: ChatConve
     } finally {
       setLoading(false);
     }
-  }, [message, room]);
+  }, [message, roomId]);
 
   useEffect(() => {
     setDraft("");
     void loadMessages();
-  }, [loadMessages]);
+  }, [roomId, loadMessages]);
 
   useEffect(() => {
-    if (!loading) {
-      scrollToBottom();
-    }
+    if (!roomId || loading) return;
+
+    const pollMessages = async () => {
+      try {
+        const items = await fetchChatMessages(roomId);
+        setMessages((prev) => {
+          if (
+            prev.length === items.length &&
+            prev.every((messageItem, index) => messageItem.id === items[index]?.id)
+          ) {
+            return prev;
+          }
+          return items;
+        });
+      } catch {
+        // 폴링 실패는 조용히 무시
+      }
+    };
+
+    const intervalId = window.setInterval(() => {
+      void pollMessages();
+    }, 4000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [roomId, loading]);
+
+  useLayoutEffect(() => {
+    if (loading) return;
+    scrollToBottom();
   }, [loading, messages, scrollToBottom]);
 
   const handleSend = async () => {
@@ -73,12 +102,18 @@ export default function ChatConversationPanel({ room, onRoomUpdated }: ChatConve
       setMessages((prev) => [...prev, response.message]);
       setDraft("");
       onRoomUpdated?.(response.room);
+      requestAnimationFrame(() => {
+        scrollToBottom();
+      });
     } catch (error) {
       const errorMessage =
         error instanceof ApiError ? error.message : "메시지 전송에 실패했습니다.";
       message.error(errorMessage);
     } finally {
       setSending(false);
+      requestAnimationFrame(() => {
+        composerRef.current?.focus();
+      });
     }
   };
 
@@ -104,7 +139,7 @@ export default function ChatConversationPanel({ room, onRoomUpdated }: ChatConve
         <Typography.Text className={styles.headerTitle}>{room.title}</Typography.Text>
       </div>
 
-      <div ref={messageListRef} className={styles.messageList}>
+      <div className={styles.messageList}>
         {loading ? (
           <div className={styles.loadingState}>
             <Spin />
@@ -172,16 +207,17 @@ export default function ChatConversationPanel({ room, onRoomUpdated }: ChatConve
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="대화를 시작해 보세요." />
           </div>
         )}
+        <div ref={messagesEndRef} className={styles.messagesEnd} aria-hidden />
       </div>
 
       <div className={styles.composer}>
         <Button type="text" className={styles.composerIconButton} icon={<PlusOutlined />} aria-label="첨부" />
         <div className={styles.composerInputWrap}>
           <Input.TextArea
+            ref={composerRef}
             value={draft}
             autoSize={{ minRows: 1, maxRows: 4 }}
             placeholder="메시지를 입력하세요"
-            disabled={sending}
             variant="borderless"
             className={styles.composerInput}
             onChange={(event) => setDraft(event.target.value)}

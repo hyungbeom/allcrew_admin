@@ -84,13 +84,18 @@
   display: grid;
   grid-template-columns: 360px minmax(0, 1fr);
   gap: 16px;
-  min-height: 560px;
+  height: 560px;
 }
 
 .gridLayout {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.gridLayout .chatCard {
+  height: 560px;
+  flex-shrink: 0;
 }
 
 .grid {
@@ -119,11 +124,13 @@
 .chatCard {
   border-radius: 8px;
   height: 100%;
-  min-height: 560px;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .chatCard :global(.ant-card-body) {
   height: 100%;
+  overflow: hidden;
 }
 
 .listCard :global(.ant-card-body) {
@@ -155,6 +162,7 @@
   flex-direction: column;
   flex: 1;
   min-height: 0;
+  overflow-y: auto;
 }
 
 .roomListEmpty {
