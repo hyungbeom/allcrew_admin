@@ -1,17 +1,24 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
 
 type LayoutContextValue = {
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
   toggleCollapsed: () => void;
+  pageHeaderTitle: ReactNode | null;
+  setPageHeaderTitle: (title: ReactNode | null) => void;
 };
 
 const LayoutContext = createContext<LayoutContextValue | null>(null);
 
 export function LayoutProvider({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
+  const [pageHeaderTitle, setPageHeaderTitleState] = useState<ReactNode | null>(null);
+
+  const setPageHeaderTitle = useCallback((title: ReactNode | null) => {
+    setPageHeaderTitleState(title);
+  }, []);
 
   return (
     <LayoutContext.Provider
@@ -19,6 +26,8 @@ export function LayoutProvider({ children }: { children: React.ReactNode }) {
         collapsed,
         setCollapsed,
         toggleCollapsed: () => setCollapsed((prev) => !prev),
+        pageHeaderTitle,
+        setPageHeaderTitle,
       }}
     >
       {children}

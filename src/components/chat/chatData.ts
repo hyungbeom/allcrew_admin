@@ -11,6 +11,18 @@ export type ChatRoom = {
   avatarColor: string;
 };
 
+export type ChatMessageSenderType = "admin" | "crew";
+
+export type ChatMessage = {
+  id: string;
+  senderType: ChatMessageSenderType;
+  senderName: string;
+  content: string;
+  sentAt: string;
+  sentAtIso: string;
+  isMine: boolean;
+};
+
 export type ChatTypeFilter = "all" | ChatRoomType;
 
 export const chatRooms: ChatRoom[] = [

@@ -32,6 +32,8 @@ import {
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useCompanySlug } from "@/components/layout/CompanySlugProvider";
+import { useLayout } from "@/components/layout/LayoutContext";
+import breadcrumbStyles from "@/components/layout/ContentBreadcrumb.module.css";
 import { companyPath } from "@/lib/companyPaths";
 import { fetchProject } from "@/lib/api/project";
 import { ApiError } from "@/lib/api/client";
@@ -320,6 +322,7 @@ function OverviewTab({ project }: { project: Project }) {
 export default function ProjectDetailPage({ projectId }: ProjectDetailPageProps) {
   const companySlug = useCompanySlug();
   const { message } = App.useApp();
+  const { setPageHeaderTitle } = useLayout();
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -348,6 +351,24 @@ export default function ProjectDetailPage({ projectId }: ProjectDetailPageProps)
   useEffect(() => {
     void loadProject();
   }, [loadProject]);
+
+  useEffect(() => {
+    if (!project) {
+      setPageHeaderTitle(null);
+      return;
+    }
+
+    setPageHeaderTitle(
+      <>
+        <span className={breadcrumbStyles.pageTitleMuted}>프로젝트 상세</span>
+        <span className={breadcrumbStyles.pageTitleSeparator}>&gt;</span>
+        <span className={breadcrumbStyles.pageTitleName}>{project.name}</span>
+        <Tag color={statusTagColor[project.status]}>{statusLabel[project.status]}</Tag>
+      </>,
+    );
+
+    return () => setPageHeaderTitle(null);
+  }, [project, setPageHeaderTitle]);
 
   const tabItems = useMemo(() => {
     if (!project) return [];

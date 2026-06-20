@@ -4,15 +4,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Breadcrumb, Typography } from "antd";
 import { getBreadcrumb, getPageTitle } from "@/config/navigation";
+import { useLayout } from "@/components/layout/LayoutContext";
 import { parseAppPathname } from "@/lib/companyPaths";
 import styles from "./ContentBreadcrumb.module.css";
 
 export default function ContentBreadcrumb() {
   const pathname = usePathname();
+  const { pageHeaderTitle } = useLayout();
   const { routePath } = parseAppPathname(pathname);
   const isDashboard = routePath === "/dashboard";
   const breadcrumbItems = getBreadcrumb(pathname);
-  const pageTitle = getPageTitle(pathname);
+  const pageTitle = pageHeaderTitle ?? getPageTitle(pathname);
 
   return (
     <div className={`${styles.pageHeader} ${isDashboard ? styles.pageHeaderDashboard : ""}`}>
@@ -34,7 +36,7 @@ export default function ContentBreadcrumb() {
       />
       {!isDashboard && (
         <Typography.Title level={2} className={styles.pageTitle}>
-          {pageTitle}
+          {typeof pageTitle === "string" ? pageTitle : <span className={styles.pageTitleContent}>{pageTitle}</span>}
         </Typography.Title>
       )}
     </div>

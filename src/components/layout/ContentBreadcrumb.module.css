@@ -20,3 +20,30 @@
   font-weight: 700 !important;
   line-height: 1.3 !important;
 }
+
+.pageTitleContent {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pageTitleMuted {
+  color: rgba(0, 0, 0, 0.45);
+  font-weight: 600;
+}
+
+.pageTitleSeparator {
+  color: rgba(0, 0, 0, 0.25);
+  font-weight: 500;
+}
+
+.pageTitleName {
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.pageTitleContent :global(.ant-tag) {
+  margin-inline-end: 0;
+  font-size: 13px;
+  font-weight: 500;
+}

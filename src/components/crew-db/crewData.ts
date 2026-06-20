@@ -83,6 +83,15 @@ export const crewMembers: CrewMember[] = [
   },
 ];
 
+export function formatPhone(phone: string) {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length === 11) {
+    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+  }
+
+  return phone;
+}
+
 export function maskPhone(phone: string) {
   const digits = phone.replace(/\D/g, "");
   if (digits.length < 8) {
@@ -93,7 +102,15 @@ export function maskPhone(phone: string) {
 }
 
 export function formatRecentWork(date: string) {
+  if (!date?.trim()) {
+    return "-";
+  }
+
   const [year, month, day] = date.split("-");
+  if (!year || !month || !day) {
+    return "-";
+  }
+
   return `${year}.${month}.${day}`;
 }
 

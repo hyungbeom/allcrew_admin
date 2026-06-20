@@ -2,12 +2,12 @@
 
 import {
   AppstoreOutlined,
-  DownloadOutlined,
+  FileExcelOutlined,
   FolderOutlined,
   PlusOutlined,
   UnorderedListOutlined,
 } from "@ant-design/icons";
-import { App, Button, Card, Input, Progress, Space, Table, Tag } from "antd";
+import { App, Button, Card, Input, Progress, Select, Space, Table, Tag } from "antd";
 import type { TableColumnsType, TableProps } from "antd";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -16,6 +16,8 @@ import { useCompanySlug } from "@/components/layout/CompanySlugProvider";
 import { companyPath } from "@/lib/companyPaths";
 import { fetchProjects } from "@/lib/api/project";
 import { ApiError } from "@/lib/api/client";
+import { downloadProjectListExcel } from "@/lib/export/downloadProjectListExcel";
+import { useProjectFilterOptions } from "@/hooks/useProjectFilterOptions";
 import {
   formatBudget,
   statusLabel,
@@ -36,6 +38,8 @@ export default function ProjectPage() {
   const router = useRouter();
   const companySlug = useCompanySlug();
   const { message } = App.useApp();
+  const { options: projectFilterOptions } = useProjectFilterOptions();
+  const [projectFilter, setProjectFilter] = useState("all");
   const [searchText, setSearchText] = useState("");
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -66,6 +70,10 @@ export default function ProjectPage() {
 
     return projects
       .filter((project) => {
+        if (projectFilter !== "all" && project.id !== projectFilter) {
+          return false;
+        }
+
         if (!keyword) {
           return true;
         }
@@ -76,10 +84,20 @@ export default function ProjectPage() {
         );
       })
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  }, [searchText, projects]);
+  }, [projectFilter, searchText, projects]);
 
   const handleTableChange: TableProps<Project>["onChange"] = () => {
     // antd Table column filter / sort는 dataSource 기준으로 클라이언트 처리
+  };
+
+  const handleDownloadProjectList = () => {
+    if (filteredProjects.length === 0) {
+      message.warning("다운로드할 프로젝트가 없습니다.");
+      return;
+    }
+
+    downloadProjectListExcel(filteredProjects);
+    message.success("프로젝트 리스트를 다운로드했습니다.");
   };
 
   const handleRowClick = (record: Project) => {
@@ -174,16 +192,27 @@ export default function ProjectPage() {
       <div className={styles.pageTop}>
         <span className={styles.subtitle}>총 {projects.length}개의 프로젝트가 등록되어 있어요.</span>
         <Space>
-          <Button icon={<DownloadOutlined />} onClick={() => message.info("CSV 다운로드를 준비 중입니다.")}>
-            CSV
-          </Button>
           <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalOpen(true)}>
             새 프로젝트
+          </Button>
+          <Button
+            className={styles.downloadButton}
+            icon={<FileExcelOutlined className={styles.downloadIcon} />}
+            onClick={handleDownloadProjectList}
+          >
+            프로젝트 리스트 다운로드
           </Button>
         </Space>
       </div>
 
       <div className={styles.toolbar}>
+        <Select
+          className={styles.projectSelect}
+          value={projectFilter}
+          options={projectFilterOptions}
+          prefix={<FolderOutlined style={{ color: "rgba(0,0,0,0.45)" }} />}
+          onChange={setProjectFilter}
+        />
         <Input.Search
           allowClear
           className={styles.searchInput}

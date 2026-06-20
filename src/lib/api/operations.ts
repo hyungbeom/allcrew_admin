@@ -2,7 +2,7 @@ import { apiFetch } from "./client";
 import type { CrewMember } from "@/components/crew-db/crewData";
 import type { Contract } from "@/components/contract/contractData";
 import type { Settlement } from "@/components/settlement/settlementData";
-import type { ChatRoom } from "@/components/chat/chatData";
+import type { ChatMessage, ChatRoom } from "@/components/chat/chatData";
 import type { Incident } from "@/components/safenet/safenetData";
 import type { PeriodKey, TopCrewRow } from "@/components/statistics/statisticsData";
 
@@ -125,6 +125,30 @@ export async function fetchCrewMembers() {
   }));
 }
 
+export type CreateCrewPayload = {
+  name: string;
+  phone: string;
+  role: string;
+  projectIds?: string[];
+};
+
+export type CreateCrewApiResponse = {
+  message: string;
+  crew: CrewMember;
+};
+
+export async function createCrewMember(payload: CreateCrewPayload) {
+  const response = await apiFetch<CreateCrewApiResponse>("/api/admin/crew", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+  return {
+    ...response.crew,
+    recentWorkDate: response.crew.recentWorkDate ?? "",
+  };
+}
+
 export async function fetchContracts() {
   const response = await apiFetch<ContractListApiResponse>("/api/admin/contracts");
   return response;
@@ -137,6 +161,68 @@ export async function fetchSettlements() {
 export async function fetchChatRooms() {
   const response = await apiFetch<ChatListApiResponse>("/api/admin/chats");
   return response.items;
+}
+
+export type CreateDirectChatPayload = {
+  crewId: string;
+  projectCode?: string;
+};
+
+export type CreateDirectChatApiResponse = {
+  message: string;
+  room: ChatRoom;
+};
+
+export async function createDirectChat(payload: CreateDirectChatPayload) {
+  return apiFetch<CreateDirectChatApiResponse>("/api/admin/chats/direct", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export type CreateGroupChatPayload = {
+  projectCode: string;
+  title?: string;
+  crewIds: string[];
+};
+
+export type CreateGroupChatApiResponse = {
+  message: string;
+  room: ChatRoom;
+};
+
+export async function createGroupChat(payload: CreateGroupChatPayload) {
+  return apiFetch<CreateGroupChatApiResponse>("/api/admin/chats/group", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export type ChatMessageListApiResponse = {
+  items: ChatMessage[];
+  total: number;
+};
+
+export async function fetchChatMessages(roomCode: string) {
+  const response = await apiFetch<ChatMessageListApiResponse>(
+    `/api/admin/chats/${encodeURIComponent(roomCode)}/messages`,
+  );
+  return response.items;
+}
+
+export type SendChatMessageApiResponse = {
+  message: ChatMessage;
+  room: ChatRoom;
+};
+
+export async function sendChatMessage(roomCode: string, content: string) {
+  return apiFetch<SendChatMessageApiResponse>(
+    `/api/admin/chats/${encodeURIComponent(roomCode)}/messages`,
+    {
+      method: "POST",
+      body: JSON.stringify({ content }),
+    },
+  );
 }
 
 export async function fetchSafenetIncidents() {
