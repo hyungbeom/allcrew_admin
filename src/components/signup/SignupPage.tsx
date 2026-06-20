@@ -17,6 +17,7 @@ import {
   Divider,
   Form,
   Input,
+  Space,
   Steps,
   Typography,
 } from "antd";
@@ -474,27 +475,35 @@ export default function SignupPage() {
         </Form.Item>
         <Form.Item label="기업 영문 이름 (URL)" required>
           <div className={styles.inlineField}>
-            <Form.Item
-              name="companySlug"
-              noStyle
-              rules={[
-                { required: true, message: "기업 영문 이름을 입력해 주세요." },
-                {
-                  pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-                  message: "영문 소문자, 숫자, 하이픈(-)만 사용할 수 있습니다.",
-                },
-                { min: 2, max: 50, message: "2~50자로 입력해 주세요." },
-              ]}
-            >
+            <Space.Compact block>
               <Input
-                placeholder="allcrew-event"
-                addonBefore="localhost:3000/"
-                onChange={(event) => {
-                  form.setFieldValue("companySlug", normalizeCompanySlug(event.target.value));
-                  setSlugChecked(false);
-                }}
+                readOnly
+                value="localhost:3000/"
+                tabIndex={-1}
+                className={styles.slugPrefixInput}
               />
-            </Form.Item>
+              <Form.Item
+                name="companySlug"
+                noStyle
+                rules={[
+                  { required: true, message: "기업 영문 이름을 입력해 주세요." },
+                  {
+                    pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+                    message: "영문 소문자, 숫자, 하이픈(-)만 사용할 수 있습니다.",
+                  },
+                  { min: 2, max: 50, message: "2~50자로 입력해 주세요." },
+                ]}
+              >
+                <Input
+                  placeholder="allcrew-event"
+                  className={styles.slugValueInput}
+                  onChange={(event) => {
+                    form.setFieldValue("companySlug", normalizeCompanySlug(event.target.value));
+                    setSlugChecked(false);
+                  }}
+                />
+              </Form.Item>
+            </Space.Compact>
             <Button onClick={handleSlugCheck}>중복 확인</Button>
           </div>
           <Typography.Text type="secondary" className={styles.fieldHint}>

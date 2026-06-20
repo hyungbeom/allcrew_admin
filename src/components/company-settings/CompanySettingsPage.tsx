@@ -1,6 +1,6 @@
 "use client";
 
-import { App, Button, Card, Form, Input, Spin, Typography } from "antd";
+import { App, Button, Card, Form, Input, Space, Spin, Typography } from "antd";
 import { useCallback, useEffect, useState } from "react";
 import { ApiError } from "@/lib/api/client";
 import {
@@ -97,8 +97,13 @@ export default function CompanySettingsPage() {
             <Input disabled />
           </Form.Item>
 
-          <Form.Item label="영문 URL" name="companySlug">
-            <Input disabled addonBefore="/" />
+          <Form.Item label="영문 URL">
+            <Space.Compact block>
+              <Input disabled readOnly value="/" className={styles.slugPrefixInput} tabIndex={-1} />
+              <Form.Item name="companySlug" noStyle>
+                <Input disabled className={styles.slugValueInput} />
+              </Form.Item>
+            </Space.Compact>
           </Form.Item>
 
           <Form.Item label="주소" name="address">
