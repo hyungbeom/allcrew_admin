@@ -6,6 +6,17 @@ import { EllipsisOutlined } from "@ant-design/icons";
 import { useMemo } from "react";
 import styles from "./DashboardCharts.module.css";
 import cardTheme from "./dashboardCard.module.css";
+import {
+  createChartKey,
+  normalizeCategoryPoints,
+  normalizeChartPoints,
+  normalizeStatPoints,
+  withChartFallbackPoints,
+  withStatFallbackPoints,
+  type CategoryPoint,
+  type ChartPoint,
+  type StatPoint,
+} from "./chartUtils";
 
 const CHART_COLORS = [
   "#1677ff",
@@ -17,10 +28,6 @@ const CHART_COLORS = [
   "#ff4d4f",
   "#13c2c2",
 ];
-
-type ChartPoint = { month: string; value: number };
-type CategoryPoint = { category: string; value: number };
-type StatPoint = { label: string; value: number };
 
 type DashboardChartsProps = {
   monthlySales: ChartPoint[];
@@ -96,13 +103,13 @@ function ContractSettlementCard({
           <Typography.Text type="secondary" className={styles.miniChartLabel}>
             계약
           </Typography.Text>
-          <Column {...contractColumnConfig} />
+          <Column key={createChartKey("contract", contractStats)} {...contractColumnConfig} />
         </div>
         <div>
           <Typography.Text type="secondary" className={styles.miniChartLabel}>
             정산
           </Typography.Text>
-          <Column {...settlementColumnConfig} />
+          <Column key={createChartKey("settlement", settlementStats)} {...settlementColumnConfig} />
         </div>
       </div>
     </Card>
@@ -115,19 +122,30 @@ export default function DashboardCharts({
   contractStats,
   settlementStats,
 }: DashboardChartsProps) {
-  const salesData = monthlySales.length > 0 ? monthlySales : [{ month: "1월", value: 0 }];
+  const salesData = useMemo(
+    () => withChartFallbackPoints(normalizeChartPoints(monthlySales)),
+    [monthlySales],
+  );
   const salesTotal = useMemo(
     () => salesData.reduce((sum, item) => sum + item.value, 0),
     [salesData],
   );
 
-  const categoryData = useMemo(
-    () =>
-      categoryDistribution.map((item, index) => ({
-        ...item,
-        color: CHART_COLORS[index % CHART_COLORS.length],
-      })),
-    [categoryDistribution],
+  const categoryData = useMemo(() => {
+    const normalized = normalizeCategoryPoints(categoryDistribution);
+    return normalized.map((item, index) => ({
+      ...item,
+      color: CHART_COLORS[index % CHART_COLORS.length],
+    }));
+  }, [categoryDistribution]);
+
+  const normalizedContractStats = useMemo(
+    () => withStatFallbackPoints(normalizeStatPoints(contractStats)),
+    [contractStats],
+  );
+  const normalizedSettlementStats = useMemo(
+    () => withStatFallbackPoints(normalizeStatPoints(settlementStats)),
+    [settlementStats],
   );
 
   const totalProjects = categoryData.reduce((sum, item) => sum + item.value, 0);
@@ -196,7 +214,7 @@ export default function DashboardCharts({
           </Typography.Title>
 
           <div className={styles.chartAreaWrap}>
-            <Line {...lineConfig} />
+            <Line key={createChartKey("sales", salesData)} {...lineConfig} />
           </div>
         </Card>
       </Col>
@@ -228,7 +246,7 @@ export default function DashboardCharts({
             {categoryData.length > 0 ? (
               <div className={styles.pieLayout}>
                 <div className={styles.pieChartArea}>
-                  <Pie {...pieConfig} />
+                  <Pie key={createChartKey("category", categoryData)} {...pieConfig} />
                   <div className={styles.pieCenter}>
                     <Typography.Text type="secondary" className={styles.pieCenterLabel}>
                       총 프로젝트
@@ -259,7 +277,10 @@ export default function DashboardCharts({
       </Col>
 
       <Col xs={24} lg={8}>
-        <ContractSettlementCard contractStats={contractStats} settlementStats={settlementStats} />
+        <ContractSettlementCard
+          contractStats={normalizedContractStats}
+          settlementStats={normalizedSettlementStats}
+        />
       </Col>
     </Row>
   );

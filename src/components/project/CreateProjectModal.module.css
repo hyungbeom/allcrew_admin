@@ -32,7 +32,7 @@
 }
 
 .stepsWrap {
-  padding: 32px 28px 24px;
+  padding: 50px 20px 50px;
 }
 
 .stepsWrap :global(.ant-steps) {
@@ -83,10 +83,6 @@
   padding: 24px 28px;
 }
 
-.body :global(textarea) {
-  resize: none;
-}
-
 .formSection {
   display: flex;
   flex-direction: column;
@@ -121,25 +117,18 @@
   gap: 16px;
 }
 
-.locationButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+.addressCompact {
   width: 100%;
-  height: 44px;
-  border: 1px dashed #d9d9d9;
-  border-radius: 8px;
-  background: #fafafa;
-  color: rgba(0, 0, 0, 0.65);
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
 }
 
-.locationButton:hover {
-  border-color: #1677ff;
-  color: #1677ff;
+.addressCompact :global(.ant-input) {
+  flex: 1;
+}
+
+.addressFieldStack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .infoBox {

@@ -1,10 +1,41 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Avatar, Badge, Button, Drawer, Flex, Space, Tag, Typography } from "antd";
-import { BellOutlined, CheckOutlined } from "@ant-design/icons";
-import { initialNotifications, type NotificationItem } from "./notifications";
+import { Button, Drawer, Tag, Typography } from "antd";
+import {
+  getNotificationTimeDisplay,
+  initialNotifications,
+  type NotificationItem,
+} from "./notifications";
 import styles from "./NotificationDrawer.module.css";
+
+function getRelativeTagColor(daysAgo: number) {
+  if (daysAgo === 1) {
+    return "processing";
+  }
+  if (daysAgo <= 3) {
+    return "blue";
+  }
+  return "default";
+}
+
+function NotificationTime({ createdAt }: { createdAt: string }) {
+  const display = getNotificationTimeDisplay(createdAt);
+
+  if (display.kind === "relative") {
+    return (
+      <Tag
+        variant="filled"
+        color={getRelativeTagColor(display.daysAgo)}
+        className={styles.relativeTag}
+      >
+        {display.label}
+      </Tag>
+    );
+  }
+
+  return <Typography.Text className={styles.itemTime}>{display.label}</Typography.Text>;
+}
 
 type NotificationDrawerProps = {
   open: boolean;
@@ -20,9 +51,6 @@ export default function NotificationDrawer({
   const [notifications, setNotifications] = useState<NotificationItem[]>(initialNotifications);
 
   const unreadCount = notifications.filter((item) => !item.read).length;
-  const totalCount = notifications.length;
-  const displayList =
-    unreadCount > 0 ? notifications.filter((item) => !item.read) : notifications;
 
   useEffect(() => {
     onUnreadCountChange?.(unreadCount);
@@ -41,34 +69,31 @@ export default function NotificationDrawer({
   return (
     <Drawer
       title={
-        <Flex vertical gap={2}>
-          <Typography.Title level={5} style={{ margin: 0 }}>
+        <div className={styles.header}>
+          <Typography.Title level={4} className={styles.headerTitle}>
             알림
           </Typography.Title>
-          <Typography.Text type="secondary" style={{ fontSize: 13, fontWeight: 400 }}>
-            전체 {totalCount}건 · 안 읽음 {unreadCount}건
-          </Typography.Text>
-        </Flex>
+          <Typography.Paragraph className={styles.headerDesc}>
+            시스템 알림과 데이터 변경 내역을 확인할 수 있습니다.
+          </Typography.Paragraph>
+        </div>
       }
       extra={
-        <Button type="primary" icon={<CheckOutlined />} onClick={handleMarkAllRead}>
+        <Button className={styles.markAllButton} onClick={handleMarkAllRead}>
           모두 읽음
         </Button>
       }
       placement="right"
       open={open}
       onClose={onClose}
-      size={400}
+      closable={false}
+      size={420}
       className={styles.drawer}
       destroyOnHidden={false}
       styles={{ body: { padding: 0 } }}
     >
-      {unreadCount > 0 && (
-        <div className={styles.sectionHeader}>안 읽음 {unreadCount}</div>
-      )}
-
       <div className={styles.list}>
-        {displayList.map((item) => (
+        {notifications.map((item) => (
           <div
             key={item.id}
             className={`${styles.item} ${!item.read ? styles.itemUnread : ""}`}
@@ -82,26 +107,13 @@ export default function NotificationDrawer({
               }
             }}
           >
-            <Avatar size={36} icon={<BellOutlined />} className={styles.itemAvatar} />
-
-            <div className={styles.itemBody}>
-              <Flex align="center" justify="space-between" gap={8} className={styles.itemMeta}>
-                <Space size={6} align="center">
-                  <Tag className={styles.itemTag}>{item.tag}</Tag>
-                  {!item.read && <Badge dot color="#1677ff" />}
-                </Space>
-                <Typography.Text type="secondary" className={styles.itemTime}>
-                  {item.time}
-                </Typography.Text>
-              </Flex>
-
-              <Typography.Text strong className={styles.itemTitle}>
-                {item.title}
-              </Typography.Text>
-              <Typography.Text type="secondary" className={styles.itemDescription}>
-                {item.description}
-              </Typography.Text>
+            <div className={styles.itemHead}>
+              <Typography.Text className={styles.itemTitle}>{item.title}</Typography.Text>
+              <NotificationTime createdAt={item.createdAt} />
             </div>
+            <Typography.Paragraph className={styles.itemDescription}>
+              {item.description}
+            </Typography.Paragraph>
           </div>
         ))}
       </div>

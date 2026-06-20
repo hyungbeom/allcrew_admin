@@ -2,158 +2,146 @@
   width: 100%;
 }
 
-.pageTop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 16px;
-}
-
 .subtitle {
+  display: block;
+  margin-bottom: 16px;
   font-size: 14px;
   color: rgba(0, 0, 0, 0.45);
 }
 
-.layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 16px;
-  align-items: start;
-}
-
-.calendarCard,
-.detailCard {
+.calendarWrap {
+  min-width: 0;
+  border: 1px solid #f0f0f0;
   border-radius: 8px;
+  background: #fff;
+  /* antd fullscreen calendar 기본 셀 높이 (dateValue + dateContent 3줄) */
+  --calendar-date-value-height: 24px;
+  --calendar-date-content-min-height: 86px;
+  --calendar-date-min-height: calc(
+    var(--calendar-date-value-height) + var(--calendar-date-content-min-height) + 6px
+  );
+  /* 막대 좌우 여백 — start/end·single에만 적용, middle은 셀 전체 너비로 연결 */
+  --calendar-events-inline-padding: 8px;
+  --calendar-bar-overlap: 2px;
+  --calendar-bar-height: 24px;
+  --calendar-events-top-gap: 10px;
 }
 
-.calendarCard :global(.ant-picker-calendar) {
-  background: transparent;
+.calendarWrap :global(.ant-picker-content tbody tr) {
+  height: auto;
 }
 
-.calendarCard :global(.ant-picker-calendar .ant-picker-panel) {
-  border-top: none;
+.calendarWrap :global(.ant-picker-cell) {
+  vertical-align: top;
+  overflow: visible;
 }
 
-.calendarCard :global(.ant-picker-calendar .ant-picker-body) {
+.calendarWrap :global(.ant-picker-cell-inner),
+.calendarWrap :global(.ant-picker-calendar-date) {
+  height: auto;
+  min-height: var(--calendar-date-min-height);
+  overflow: visible;
+}
+
+.calendarWrap :global(.ant-picker-calendar.ant-picker-calendar-full .ant-picker-calendar-date) {
+  width: 100% !important;
+  margin-inline: 0 !important;
+  padding-inline: 0 !important;
+  box-sizing: border-box;
+}
+
+.calendarWrap :global(.ant-picker-calendar-date-value) {
+  padding-inline: 8px;
+  min-height: var(--calendar-date-value-height);
+  line-height: var(--calendar-date-value-height);
+}
+
+.calendarWrap :global(.ant-picker-calendar-date-content) {
+  width: 100% !important;
+  min-height: var(--calendar-date-content-min-height) !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  padding-top: var(--calendar-events-top-gap);
+}
+
+.events {
+  margin: 0;
   padding: 0;
+  list-style: none;
 }
 
-.calendarCard :global(.ant-picker-calendar thead th) {
-  padding: 10px 0;
+.events li {
+  overflow: visible;
+}
+
+.eventBar {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: var(--calendar-bar-height);
+  margin-bottom: 4px;
+  padding: 0 8px;
+  overflow: hidden;
   font-size: 13px;
   font-weight: 500;
-  color: rgba(0, 0, 0, 0.65);
+  line-height: var(--calendar-bar-height);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+}
+
+.eventBar_labeled {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 8px;
   text-align: center;
 }
 
-.calendarCard :global(.ant-picker-calendar thead th:first-child) {
-  color: #ff4d4f;
+.eventBar_single {
+  width: calc(100% - 2 * var(--calendar-events-inline-padding));
+  margin-inline: var(--calendar-events-inline-padding);
+  border-radius: 6px;
 }
 
-.calendarCard :global(.ant-picker-calendar thead th:last-child) {
-  color: #1677ff;
+.eventBar_start {
+  width: calc(100% - var(--calendar-events-inline-padding) + var(--calendar-bar-overlap));
+  margin-left: var(--calendar-events-inline-padding);
+  margin-right: calc(-1 * var(--calendar-bar-overlap));
+  padding-right: calc(8px + var(--calendar-bar-overlap));
+  border-radius: 6px 0 0 6px;
+  overflow: visible;
 }
 
-.calendarCard :global(.ant-picker-calendar .ant-picker-cell) {
-  padding: 0;
-}
-
-.calendarCard :global(.ant-picker-calendar .ant-picker-cell::before) {
-  display: none;
-}
-
-.calendarCard :global(.ant-picker-calendar .ant-picker-cell-inner) {
-  width: 100%;
-  min-height: 108px;
-  margin: 0;
-  padding: 0;
+.eventBar_middle {
+  width: calc(100% + 2 * var(--calendar-bar-overlap));
+  margin-right: calc(-1 * var(--calendar-bar-overlap));
+  margin-left: calc(-1 * var(--calendar-bar-overlap));
+  padding-right: calc(8px + var(--calendar-bar-overlap));
+  padding-left: calc(8px + var(--calendar-bar-overlap));
   border-radius: 0;
+  overflow: visible;
 }
 
-.calendarHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
+.eventBar_end {
+  width: calc(100% - var(--calendar-events-inline-padding) + var(--calendar-bar-overlap));
+  margin-right: var(--calendar-events-inline-padding);
+  margin-left: calc(-1 * var(--calendar-bar-overlap));
+  padding-left: calc(8px + var(--calendar-bar-overlap));
+  border-radius: 0 6px 6px 0;
+  overflow: visible;
 }
 
-.monthLabel {
-  font-size: 18px;
-  font-weight: 600;
-  color: rgba(0, 0, 0, 0.88);
+.calendarWrap :global(.ant-picker-cell-week .ant-picker-cell-inner) {
+  min-height: var(--calendar-date-min-height);
+  height: 100%;
+  box-sizing: border-box;
 }
 
-.totalCount {
-  font-size: 13px;
-  color: rgba(0, 0, 0, 0.45);
-}
-
-.dateCell {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  width: 100%;
-  min-height: 108px;
-  padding: 6px 8px;
-  border-top: 1px solid #f0f0f0;
-  border-right: 1px solid #f0f0f0;
-  background: #fff;
-}
-
-.dateCellSelected {
-  background: #f0f7ff;
-}
-
-.dateCellOtherMonth {
-  background: #fafafa;
-}
-
-.dateNumber {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  font-size: 13px;
-  color: rgba(0, 0, 0, 0.88);
-}
-
-.dateNumberOtherMonth {
-  color: rgba(0, 0, 0, 0.25);
-}
-
-.dateNumberSelected {
-  border-radius: 50%;
-  background: #1677ff;
-  color: #fff;
-  font-weight: 600;
-}
-
-.eventList {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-  flex: 1;
-}
-
-.eventTag {
-  overflow: hidden;
-  padding: 0 6px;
-  border-radius: 4px;
-  background: #f9f0ff;
-  color: #722ed1;
-  font-size: 11px;
-  line-height: 16px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.moreCount {
-  font-size: 11px;
-  color: rgba(0, 0, 0, 0.45);
-  line-height: 16px;
+.detailDrawer :global(.ant-drawer-header) {
+  display: none;
 }
 
 .detailLabel {
@@ -165,90 +153,104 @@
 
 .detailDate {
   display: block;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   font-size: 22px;
   font-weight: 700;
   color: rgba(0, 0, 0, 0.88);
   line-height: 1.3;
 }
 
+.eventList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .eventCard {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 12px 12px 0;
-  border: 1px solid #f0f0f0;
+  align-items: stretch;
+  border: 1.5px solid #f0f0f0;
   border-radius: 8px;
   background: #fff;
   cursor: pointer;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: box-shadow 0.2s;
 }
 
 .eventCard:hover {
-  border-color: #d9d9d9;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-.eventCard + .eventCard {
-  margin-top: 8px;
-}
-
-.eventAccent {
-  width: 3px;
-  align-self: stretch;
-  flex-shrink: 0;
-  border-radius: 8px 0 0 8px;
-  background: #1677ff;
-}
-
-.eventBody {
+.eventCardContent {
   flex: 1;
   min-width: 0;
+  padding: 14px 12px 14px 16px;
 }
 
-.eventTitle {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 14px;
-  font-weight: 500;
+.eventCardHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.eventCardTitle {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
   color: rgba(0, 0, 0, 0.88);
 }
 
-.statusBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: #fafafa;
+.eventCardCategory {
+  flex-shrink: 0;
   font-size: 12px;
-  color: rgba(0, 0, 0, 0.65);
+  line-height: 20px;
+  color: rgba(0, 0, 0, 0.45);
+  white-space: nowrap;
 }
 
-.statusDot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.25);
+.eventCardMeta {
+  margin: 0;
+}
+
+.metaRow {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+}
+
+.metaRow + .metaRow {
+  margin-top: 8px;
+}
+
+.metaRow dt {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.metaRow dd {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.88);
+  word-break: break-word;
 }
 
 .eventChevron {
   flex-shrink: 0;
+  align-self: center;
+  margin-right: 12px;
   color: rgba(0, 0, 0, 0.25);
   font-size: 12px;
 }
 
 .emptyDetail {
   padding: 24px 0;
-}
-
-@media (max-width: 992px) {
-  .layout {
-    grid-template-columns: 1fr;
-  }
-
-  .pageTop {
-    flex-direction: column;
-    align-items: flex-start;
-  }
 }

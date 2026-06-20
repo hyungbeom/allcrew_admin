@@ -5,7 +5,6 @@ import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   DeleteOutlined,
-  EnvironmentOutlined,
   FileTextOutlined,
   InfoCircleOutlined,
   LeftOutlined,
@@ -23,8 +22,9 @@ import {
   Input,
   InputNumber,
   Modal,
-  Radio,
+  Space,
   Steps,
+  Tag,
   TimePicker,
   Typography,
   Upload,
@@ -272,7 +272,7 @@ export default function CreateProjectModal({
     }
   };
 
-  const handleSelectLocation = () => {
+  const handleAddressSearch = () => {
     openDaumPostcode((address) => {
       form.setFieldValue("address", address);
     });
@@ -360,29 +360,26 @@ export default function CreateProjectModal({
         </Form.Item>
       </div>
 
-      <div>
-        <span className={styles.fieldLabel}>
-          행사 장소 <span className={styles.required}>*</span>
-        </span>
-        <button type="button" className={styles.locationButton} onClick={handleSelectLocation}>
-          <EnvironmentOutlined />
-          지도에서 장소 선택
-        </button>
-      </div>
-
       <Form.Item
         label={<span className={styles.fieldLabel}>주소 (선택, 자동 채워짐)</span>}
-        name="address"
-        rules={[{ required: true, message: "행사 장소를 선택해 주세요." }]}
       >
-        <Input size="large" placeholder="주소" readOnly />
-      </Form.Item>
-
-      <Form.Item
-        label={<span className={styles.fieldLabel}>상세 주소 (선택)</span>}
-        name="addressDetail"
-      >
-        <Input size="large" placeholder="ex) 2층 무대 옆 대기실" />
+        <div className={styles.addressFieldStack}>
+          <Space.Compact className={styles.addressCompact}>
+            <Form.Item
+              name="address"
+              noStyle
+              rules={[{ required: true, message: "주소를 검색해 주세요." }]}
+            >
+              <Input size="large" placeholder="주소" readOnly />
+            </Form.Item>
+            <Button size="large" onClick={handleAddressSearch}>
+              주소 검색
+            </Button>
+          </Space.Compact>
+          <Form.Item name="addressDetail" noStyle>
+            <Input size="large" placeholder="ex) 2층 무대 옆 대기실" />
+          </Form.Item>
+        </div>
       </Form.Item>
 
       <div className={styles.infoBox}>
@@ -659,13 +656,15 @@ function EventTypeSelector({
   onChange?: (value: EventType) => void;
 }) {
   return (
-    <Radio.Group value={value} buttonStyle="solid" onChange={(event) => onChange?.(event.target.value)}>
-      {EVENT_TYPES.map((type) => (
-        <Radio.Button key={type} value={type}>
-          {type}
-        </Radio.Button>
-      ))}
-    </Radio.Group>
+    <Tag.CheckableTagGroup
+      options={EVENT_TYPES}
+      value={value ?? null}
+      onChange={(next) => {
+        if (next !== null) {
+          onChange?.(next as EventType);
+        }
+      }}
+    />
   );
 }
 

@@ -33,7 +33,7 @@ import CreateProjectModal from "@/components/project/CreateProjectModal";
 import styles from "./DashboardHome.module.css";
 import cardTheme from "./dashboardCard.module.css";
 import DashboardChartsLazy from "./DashboardChartsLazy";
-import { toSparklineData } from "./chartUtils";
+import { createChartKey, toSparklineData } from "./chartUtils";
 import { useCompanySlug } from "@/components/layout/CompanySlugProvider";
 import { statusLabel, type ProjectStatus } from "@/components/project/projectData";
 import { companyPath } from "@/lib/companyPaths";
@@ -55,11 +55,39 @@ type TaskCard = {
   footerLabel: string;
   footerValue: string;
   variant: "area" | "progress" | "applicants";
+  headerTag: { label: string; route: string };
   sparkline?: number[];
   progress?: number;
   verifiedCount?: number;
   unverifiedCount?: number;
 };
+
+function TaskCardTitle({ label, tooltip }: { label: string; tooltip: string }) {
+  return (
+    <span className={styles.taskCardTitleGroup}>
+      <span>{label}</span>
+      <Tooltip title={tooltip}>
+        <InfoCircleOutlined className={styles.taskCardInfoIcon} />
+      </Tooltip>
+    </span>
+  );
+}
+
+function TaskCardHeaderTag({
+  label,
+  href,
+}: {
+  label: string;
+  href: string;
+}) {
+  return (
+    <Link href={href} className={styles.taskCardHeaderTagLink}>
+      <Tag variant="filled" className={styles.taskCardHeaderTag}>
+        {label}
+      </Tag>
+    </Link>
+  );
+}
 
 function TaskCardContent({ task }: { task: TaskCard }) {
   if (task.variant === "applicants" && task.unverifiedCount !== undefined && task.verifiedCount !== undefined) {
@@ -81,12 +109,15 @@ function TaskCardContent({ task }: { task: TaskCard }) {
   }
 
   if (task.variant === "area" && task.sparkline) {
+    const sparklineData = toSparklineData(task.sparkline);
+
     return (
       <div className={styles.taskChartArea}>
         <Tiny.Area
+          key={createChartKey(`task-${task.key}`, sparklineData)}
           height={46}
           autoFit
-          data={toSparklineData(task.sparkline)}
+          data={sparklineData}
           xField="index"
           yField="value"
           style={{
@@ -232,6 +263,7 @@ export default function DashboardHome() {
         value: `${unverified}명`,
         tooltip: `확인 지원자 ${verified}명, 미확인 지원자 ${unverified}명 (전체 ${totalApplicants}명)`,
         variant: "applicants",
+        headerTag: { label: "크루확인", route: "crew-db" },
         unverifiedCount: unverified,
         verifiedCount: verified,
         footerLabel: "확인 지원자",
@@ -243,6 +275,7 @@ export default function DashboardHome() {
         value: `${recruiting}건`,
         tooltip: "현재 모집 중인 프로젝트 수입니다.",
         variant: "area",
+        headerTag: { label: "전체 프로젝트", route: "project" },
         sparkline: recruitingSparkline,
         footerLabel: "진행 중",
         footerValue: `${recruiting}건`,
@@ -253,6 +286,7 @@ export default function DashboardHome() {
         value: `${pendingSettlements}건`,
         tooltip: "처리가 필요한 정산 건수입니다.",
         variant: "progress",
+        headerTag: { label: "정산 보러가기", route: "settlement" },
         progress: settlementProgress,
         footerLabel: "대기 건수",
         footerValue: `${pendingSettlements}건`,
@@ -263,6 +297,7 @@ export default function DashboardHome() {
         value: `${educationExpiring}명`,
         tooltip: "30일 이내 교육 만료 예정 크루 수입니다.",
         variant: "progress",
+        headerTag: { label: "크루확인", route: "crew-db" },
         progress: educationProgress,
         footerLabel: "30일 이내",
         footerValue: `${educationExpiring}명`,
@@ -404,12 +439,14 @@ export default function DashboardHome() {
               className={`${cardTheme.dashboardCardHead} ${styles.equalCard} ${styles.siteCard}`}
               title="현장 관리"
               extra={
-                <Tag variant="filled" color="processing" className={styles.siteHeaderTag}>
-                  <span className={styles.siteHeaderTagContent}>
-                    세이프넷 관제센터 열기
-                    <ArrowRightOutlined />
-                  </span>
-                </Tag>
+                <Link href={companyPath(companySlug, "safenet")} className={styles.siteHeaderTagLink}>
+                  <Tag variant="filled" color="processing" className={styles.siteHeaderTag}>
+                    <span className={styles.siteHeaderTagContent}>
+                      세이프넷 관제센터 열기
+                      <ArrowRightOutlined />
+                    </span>
+                  </Tag>
+                </Link>
               }
               styles={{ body: { display: "flex", flexDirection: "column", flex: 1 } }}
             >
@@ -434,10 +471,10 @@ export default function DashboardHome() {
               className={`${cardTheme.dashboardCardHead} ${styles.equalCard} ${styles.todayPanelCard}`}
               title="오늘의 현장"
               extra={
-                <Link href={companyPath(companySlug, "project")} className={styles.todayPanelLink}>
-                  전체
-                  <ArrowRightOutlined />
-                </Link>
+                <TaskCardHeaderTag
+                  label="전체 프로젝트"
+                  href={companyPath(companySlug, "project")}
+                />
               }
               styles={{ body: { display: "flex", flexDirection: "column", flex: 1, paddingTop: 12 } }}
             >
@@ -508,11 +545,12 @@ export default function DashboardHome() {
               <Col xs={24} sm={12} xl={6} key={task.key} className={styles.taskCol}>
                 <Card
                   className={`${cardTheme.dashboardCardHead} ${styles.taskCard}`}
-                  title={task.label}
+                  title={<TaskCardTitle label={task.label} tooltip={task.tooltip} />}
                   extra={
-                    <Tooltip title={task.tooltip}>
-                      <InfoCircleOutlined className={styles.taskCardInfoIcon} />
-                    </Tooltip>
+                    <TaskCardHeaderTag
+                      label={task.headerTag.label}
+                      href={companyPath(companySlug, task.headerTag.route)}
+                    />
                   }
                   styles={{ body: { padding: "16px 24px 8px" } }}
                 >
@@ -534,12 +572,16 @@ export default function DashboardHome() {
           </Row>
         </div>
 
-        <DashboardChartsLazy
-          monthlySales={dashboard?.monthlySales ?? []}
-          categoryDistribution={dashboard?.categoryDistribution ?? []}
-          contractStats={contractStats}
-          settlementStats={settlementStats}
-        />
+        {!loading && dashboard ? (
+          <DashboardChartsLazy
+            monthlySales={dashboard.monthlySales}
+            categoryDistribution={dashboard.categoryDistribution}
+            contractStats={contractStats}
+            settlementStats={settlementStats}
+          />
+        ) : (
+          <div style={{ minHeight: 320 }} />
+        )}
 
         <CreateProjectModal
           open={createModalOpen}
