@@ -181,7 +181,7 @@ export default function SafenetPage() {
           </Card>
         </div>
 
-        <div>
+        <div className={styles.rightPanel}>
           <Card className={`${styles.sideCard} ${styles.mapCard}`} size="small" styles={{ body: { padding: "16px 20px 20px" } }}>
             <div className={styles.mapHeader}>
               <Typography.Text className={styles.mapTitle}>라이브 관제 지도</Typography.Text>

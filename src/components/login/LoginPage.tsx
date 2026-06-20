@@ -8,6 +8,7 @@ import { LockOutlined, MailOutlined } from "@ant-design/icons";
 import { clearAuthSession, getAccessToken, getStoredMember, login } from "@/lib/api/auth";
 import { companyPath } from "@/lib/companyPaths";
 import { ApiError } from "@/lib/api/client";
+import { startSocialLogin, type SocialProvider } from "@/lib/auth/socialLogin";
 import styles from "./LoginPage.module.css";
 
 function BrandIcon() {
@@ -26,6 +27,17 @@ function BrandIcon() {
         strokeWidth="2.5"
         strokeLinecap="round"
         strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function KakaoIcon() {
+  return (
+    <svg className={styles.socialIcon} width="18" height="18" viewBox="0 0 18 18" aria-hidden>
+      <path
+        fill="#3C1E1E"
+        d="M9 2.5c-4.142 0-7.5 2.686-7.5 6 0 1.92 1.02 3.62 2.58 4.62l-.84 3.13a.35.35 0 0 0 .47.41l3.67-2.02c.52.08 1.05.12 1.6.12 4.142 0 7.5-2.686 7.5-6s-3.358-6-7.5-6Z"
       />
     </svg>
   );
@@ -54,13 +66,12 @@ function GoogleIcon() {
   );
 }
 
-function FacebookIcon() {
+function AppleIcon() {
   return (
     <svg className={styles.socialIcon} width="18" height="18" viewBox="0 0 18 18" aria-hidden>
-      <circle cx="9" cy="9" r="9" fill="#1877F2" />
       <path
-        fill="#fff"
-        d="M10.02 14.5V9.75h1.56l.24-1.81H10.02V6.88c0-.52.14-.88.9-.88h.96V4.21c-.17-.02-.74-.07-1.41-.07-1.39 0-2.34.85-2.34 2.41v1.1H7.04v1.81h1.29V14.5h1.69z"
+        fill="currentColor"
+        d="M13.66 9.52c-.02-2.08 1.7-3.08 1.77-3.13-1.02-1.5-2.6-1.7-3.14-1.72-1.34-.14-2.62.79-3.3.79-.69 0-1.75-.77-2.88-.75-1.48.02-2.85.86-3.61 2.18-1.54 2.67-.39 6.62 1.1 8.79.73 1.06 1.6 2.24 2.74 2.2 1.1-.04 1.52-.71 2.85-.71 1.33 0 1.7.71 2.86.69 1.18-.02 1.93-1.08 2.65-2.15.84-1.22 1.18-2.4 1.2-2.46-.03-.01-2.3-.88-2.32-3.49ZM11.9 3.1c.6-.73 1.01-1.74.9-2.75-.87.04-1.92.58-2.54 1.3-.56.65-1.05 1.69-.92 2.68.97.08 1.96-.49 2.56-1.23Z"
       />
     </svg>
   );
@@ -104,6 +115,16 @@ export default function LoginPage() {
       message.error(errorMessage);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleSocialLogin = (provider: SocialProvider) => {
+    try {
+      startSocialLogin(provider);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "SNS 로그인을 시작할 수 없습니다.";
+      message.warning(errorMessage);
     }
   };
 
@@ -191,12 +212,30 @@ export default function LoginPage() {
             또는
           </Divider>
 
-          <div className={styles.socialRow}>
-            <Button className={styles.socialButton} icon={<GoogleIcon />}>
-              Google
+          <div className={styles.socialList}>
+            <Button
+              block
+              className={`${styles.socialButton} ${styles.socialButtonKakao}`}
+              icon={<KakaoIcon />}
+              onClick={() => handleSocialLogin("kakao")}
+            >
+              카카오로 계속하기
             </Button>
-            <Button className={styles.socialButton} icon={<FacebookIcon />}>
-              Facebook
+            <Button
+              block
+              className={`${styles.socialButton} ${styles.socialButtonGoogle}`}
+              icon={<GoogleIcon />}
+              onClick={() => handleSocialLogin("google")}
+            >
+              Google로 계속하기
+            </Button>
+            <Button
+              block
+              className={`${styles.socialButton} ${styles.socialButtonApple}`}
+              icon={<AppleIcon />}
+              onClick={() => handleSocialLogin("apple")}
+            >
+              Apple로 계속하기
             </Button>
           </div>
 

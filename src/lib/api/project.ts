@@ -82,6 +82,8 @@ export type ApiProjectDetailResponse = ApiProjectResponse & {
   description?: string | null;
   address?: string;
   addressDetail?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   gpsRadius?: number;
   breakMinutes?: number;
   welfare?: string[];
@@ -104,6 +106,10 @@ export function mapApiProjectDetail(project: ApiProjectDetailResponse): Project 
     ...mapApiProject(project),
     memo: project.description ?? undefined,
     slug: project.id.toLowerCase(),
+    address: project.address,
+    addressDetail: project.addressDetail ?? undefined,
+    latitude: project.latitude ?? null,
+    longitude: project.longitude ?? null,
     gpsRadius: project.gpsRadius,
     breakMinutes: project.breakMinutes,
     welfare: project.welfare ?? [],
@@ -117,6 +123,26 @@ export function mapApiProjectDetail(project: ApiProjectDetailResponse): Project 
 export async function fetchProject(projectCode: string) {
   const response = await apiFetch<ApiProjectDetailResponse>(
     `/api/admin/projects/${encodeURIComponent(projectCode)}`,
+  );
+  return mapApiProjectDetail(response);
+}
+
+export type UpdateProjectLocationPayload = {
+  latitude: number;
+  longitude: number;
+  address?: string;
+};
+
+export async function updateProjectLocation(
+  projectCode: string,
+  payload: UpdateProjectLocationPayload,
+) {
+  const response = await apiFetch<ApiProjectDetailResponse>(
+    `/api/admin/projects/${encodeURIComponent(projectCode)}/location`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    },
   );
   return mapApiProjectDetail(response);
 }

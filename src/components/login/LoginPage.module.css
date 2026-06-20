@@ -215,32 +215,59 @@
   border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
-.socialRow {
+.socialList {
   display: flex;
+  flex-direction: column;
   gap: 12px;
 }
 
 .socialButton {
   display: inline-flex !important;
-  flex: 1;
   align-items: center;
   justify-content: center;
   gap: 10px;
   height: 48px !important;
   font-size: 14px !important;
-  font-weight: 500 !important;
-  color: #fff !important;
-  background: #1e1431 !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  font-weight: 600 !important;
   border-radius: 10px !important;
   box-shadow: none !important;
 }
 
-.socialButton:hover,
-.socialButton:focus {
+.socialButtonKakao {
+  color: rgba(0, 0, 0, 0.85) !important;
+  background: #fee500 !important;
+  border: none !important;
+}
+
+.socialButtonKakao:hover,
+.socialButtonKakao:focus {
+  color: rgba(0, 0, 0, 0.85) !important;
+  background: #f5dc00 !important;
+}
+
+.socialButtonGoogle {
+  color: rgba(0, 0, 0, 0.88) !important;
+  background: #fff !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+.socialButtonGoogle:hover,
+.socialButtonGoogle:focus {
+  color: rgba(0, 0, 0, 0.88) !important;
+  background: #fafafa !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+.socialButtonApple {
   color: #fff !important;
-  background: #261a3d !important;
-  border-color: rgba(255, 255, 255, 0.14) !important;
+  background: #000 !important;
+  border: none !important;
+}
+
+.socialButtonApple:hover,
+.socialButtonApple:focus {
+  color: #fff !important;
+  background: #1a1a1a !important;
 }
 
 .socialIcon {

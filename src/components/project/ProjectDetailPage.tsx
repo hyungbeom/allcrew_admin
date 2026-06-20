@@ -17,7 +17,6 @@ import {
   Empty,
   Progress,
   Row,
-  Segmented,
   Select,
   Space,
   Spin,
@@ -45,6 +44,9 @@ import {
   ScheduleTab,
   SettlementTab,
 } from "./ProjectDetailTabs";
+import ProjectGpsPanel from "./ProjectGpsPanel";
+import ProjectLocationEditDrawer from "./ProjectLocationEditDrawer";
+import type { KakaoLatLng } from "@/lib/kakaoMap";
 import {
   formatBudget,
   getApplicantStatusCounts,
@@ -247,68 +249,62 @@ function PlacementTab({ project }: { project: Project }) {
   );
 }
 
-function OverviewTab({ project }: { project: Project }) {
-  const [mapView, setMapView] = useState<"map" | "list">("map");
+function OverviewTab({
+  project,
+  onProjectUpdated,
+}: {
+  project: Project;
+  onProjectUpdated: (project: Project) => void;
+}) {
+  const [locationEditOpen, setLocationEditOpen] = useState(false);
+  const [savedLocation, setSavedLocation] = useState<KakaoLatLng | null>(null);
 
   return (
     <>
-      <Row gutter={16} className={styles.contentRow}>
-        <Col xs={24} lg={14}>
-          <Card title="프로젝트 정보" size="small">
-            <Descriptions column={1} size="small">
-              <Descriptions.Item label="프로젝트명">{project.name}</Descriptions.Item>
-              <Descriptions.Item label="카테고리">{project.category}</Descriptions.Item>
-              <Descriptions.Item label="장소">{project.location}</Descriptions.Item>
-              <Descriptions.Item label="기간">{getProjectPeriod(project)}</Descriptions.Item>
-              <Descriptions.Item label="근무 시간">
-                {project.workHours ?? "-"}
-              </Descriptions.Item>
-              <Descriptions.Item label="예산">{formatBudget(project.budget)}</Descriptions.Item>
-              <Descriptions.Item label="담당 매니저">
-                {project.manager ?? "미지정"}
-              </Descriptions.Item>
-            </Descriptions>
-          </Card>
-          <Card title="메모" size="small" className={styles.memoCard}>
-            <Typography.Paragraph style={{ margin: 0 }}>
-              {project.memo ?? "등록된 메모가 없습니다."}
-            </Typography.Paragraph>
-          </Card>
+      <Row gutter={16} className={styles.contentRow} align="stretch">
+        <Col xs={24} lg={14} className={styles.leftColumn}>
+          <div className={styles.leftCardStack}>
+            <Card title="프로젝트 정보" size="small" className={styles.stretchCard}>
+              <Descriptions column={1} size="small">
+                <Descriptions.Item label="프로젝트명">{project.name}</Descriptions.Item>
+                <Descriptions.Item label="카테고리">{project.category}</Descriptions.Item>
+                <Descriptions.Item label="장소">{project.location}</Descriptions.Item>
+                <Descriptions.Item label="기간">{getProjectPeriod(project)}</Descriptions.Item>
+                <Descriptions.Item label="근무 시간">
+                  {project.workHours ?? "-"}
+                </Descriptions.Item>
+                <Descriptions.Item label="예산">{formatBudget(project.budget)}</Descriptions.Item>
+                <Descriptions.Item label="담당 매니저">
+                  {project.manager ?? "미지정"}
+                </Descriptions.Item>
+              </Descriptions>
+            </Card>
+            <Card title="메모" size="small" className={styles.stretchCard}>
+              <Typography.Paragraph style={{ margin: 0 }}>
+                {project.memo ?? "등록된 메모가 없습니다."}
+              </Typography.Paragraph>
+            </Card>
+          </div>
         </Col>
-        <Col xs={24} lg={10}>
-          <Card size="small">
-            <div className={styles.mapHeader}>
-              <Space>
-                <Typography.Text className={styles.mapTitle}>현장 GPS</Typography.Text>
-                <span className={styles.liveBadge}>
-                  <span className={styles.liveDot} />
-                  실시간
-                </span>
-              </Space>
-              <Segmented
-                size="small"
-                value={mapView}
-                options={[
-                  { label: "지도", value: "map" },
-                  { label: "리스트", value: "list" },
-                ]}
-                onChange={(value) => setMapView(value as "map" | "list")}
-              />
-            </div>
-            {mapView === "map" ? (
-              <>
-                <div className={styles.mapPlaceholder}>Kakao Map · 현장 위치</div>
-                <div className={styles.mapOverlay}>
-                  <Tag>현장 크루 {project.crewCurrent}명</Tag>
-                  <Tag>GPS 반경 {project.gpsRadius ?? 100}m</Tag>
-                </div>
-              </>
-            ) : (
-              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="GPS 리스트가 없습니다." />
-            )}
+        <Col xs={24} lg={10} className={styles.rightColumn}>
+          <Card size="small" className={styles.gpsCard}>
+            <ProjectGpsPanel
+              project={project}
+              savedLocation={savedLocation}
+              onOpenLocationEdit={() => setLocationEditOpen(true)}
+            />
           </Card>
         </Col>
       </Row>
+
+      <ProjectLocationEditDrawer
+        open={locationEditOpen}
+        project={project}
+        initialCenter={savedLocation}
+        onClose={() => setLocationEditOpen(false)}
+        onProjectUpdated={onProjectUpdated}
+        onLocationSaved={setSavedLocation}
+      />
 
       <SummaryStatsRow project={project} />
     </>
@@ -430,13 +426,14 @@ export default function ProjectDetailPage({ projectId }: ProjectDetailPageProps)
       </div>
 
       <Tabs
+        className={styles.detailTabs}
         activeKey={activeTab}
         items={tabItems}
         onChange={(key) => setActiveTab(key as DetailTabKey)}
       />
 
       {activeTab === "overview" ? (
-        <OverviewTab project={project} />
+        <OverviewTab project={project} onProjectUpdated={setProject} />
       ) : activeTab === "crew" ? (
         <CrewTab project={project} />
       ) : activeTab === "placement" ? (

@@ -23,6 +23,10 @@ export type Project = {
   accumulatedCost?: number;
   applicantCount?: number;
   gpsRadius?: number;
+  latitude?: number | null;
+  longitude?: number | null;
+  address?: string;
+  addressDetail?: string | null;
   breakMinutes?: number;
   welfare?: string[];
   positions?: {
