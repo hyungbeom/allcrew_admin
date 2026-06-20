@@ -125,6 +125,14 @@ export async function fetchCrewMembers() {
   }));
 }
 
+export async function fetchCrewMember(crewId: string) {
+  const response = await apiFetch<CrewMember>(`/api/admin/crew/${encodeURIComponent(crewId)}`);
+  return {
+    ...response,
+    recentWorkDate: response.recentWorkDate ?? "",
+  };
+}
+
 export type CreateCrewPayload = {
   name: string;
   phone: string;

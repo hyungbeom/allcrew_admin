@@ -112,6 +112,23 @@ export default function CrewDbPage() {
     router.push(companyPath(companySlug, "chat"));
   }, [companySlug, router]);
 
+  const handleRowClick = useCallback(
+    (record: CrewMember) => {
+      router.push(companyPath(companySlug, `crew-db/${record.id}`));
+    },
+    [companySlug, router],
+  );
+
+  const isSelectionClick = (target: EventTarget) => {
+    const element = target as HTMLElement;
+    return Boolean(element.closest(".ant-checkbox-wrapper") || element.closest(".ant-checkbox"));
+  };
+
+  const isActionClick = (target: EventTarget) => {
+    const element = target as HTMLElement;
+    return Boolean(element.closest("button") || element.closest("a"));
+  };
+
   const columns: TableColumnsType<CrewMember> = [
     {
       title: "크루",
@@ -161,7 +178,6 @@ export default function CrewDbPage() {
       key: "workDays",
       width: "10%",
       sorter: (a, b) => a.workDays - b.workDays,
-      defaultSortOrder: "descend",
       render: (value: number) => `${value}일`,
     },
     {
@@ -197,7 +213,7 @@ export default function CrewDbPage() {
       key: "actions",
       width: "10%",
       align: "right",
-      render: () => (
+      render: (_, record) => (
         <div className={styles.actionCell}>
           <Button
             type="text"
@@ -209,7 +225,16 @@ export default function CrewDbPage() {
               handleGoToChat();
             }}
           />
-          <Button type="text" size="small" icon={<RightOutlined />} aria-label="상세 보기" />
+          <Button
+            type="text"
+            size="small"
+            icon={<RightOutlined />}
+            aria-label="상세 보기"
+            onClick={(event) => {
+              event.stopPropagation();
+              handleRowClick(record);
+            }}
+          />
         </div>
       ),
     },
@@ -280,6 +305,7 @@ export default function CrewDbPage() {
       {viewMode === "list" ? (
         <Table<CrewMember>
           className={styles.crewTable}
+          size="middle"
           rowKey="id"
           columns={columns}
           dataSource={filteredCrew}
@@ -297,11 +323,24 @@ export default function CrewDbPage() {
             showSizeChanger: false,
             showTotal: (total, range) => `${total}개 중 ${range[0]}-${range[1]} 표시`,
           }}
+          onRow={(record) => ({
+            onClick: (event) => {
+              if (isSelectionClick(event.target) || isActionClick(event.target)) return;
+              handleRowClick(record);
+            },
+            style: { cursor: "pointer" },
+          })}
         />
       ) : (
         <div className={styles.grid}>
           {filteredCrew.map((crew) => (
-            <Card key={crew.id} className={styles.gridCard} size="small" hoverable>
+            <Card
+              key={crew.id}
+              className={styles.gridCard}
+              size="small"
+              hoverable
+              onClick={() => handleRowClick(crew)}
+            >
               <div className={styles.gridCardHeader}>
                 <Typography.Text className={styles.crewName}>{crew.name}</Typography.Text>
               </div>

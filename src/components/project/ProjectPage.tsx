@@ -243,6 +243,7 @@ export default function ProjectPage() {
       {viewMode === "list" ? (
         <Table<Project>
           className={styles.projectTable}
+          size="medium"
           rowKey="id"
           loading={loading}
           columns={columns}
@@ -267,7 +268,7 @@ export default function ProjectPage() {
             <Card
               key={project.id}
               className={styles.gridCard}
-              size="small"
+              size="middle"
               hoverable
               onClick={() => handleRowClick(project)}
             >

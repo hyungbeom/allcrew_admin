@@ -84,6 +84,7 @@
 
 .gridCard {
   border-radius: 8px;
+  cursor: pointer;
 }
 
 .gridCardHeader {

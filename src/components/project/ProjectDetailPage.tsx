@@ -2,11 +2,7 @@
 
 import {
   CalendarOutlined,
-  DeleteOutlined,
-  EditOutlined,
   EnvironmentOutlined,
-  FolderOutlined,
-  MessageOutlined,
   StarFilled,
   ThunderboltOutlined,
   WalletOutlined,
@@ -413,23 +409,6 @@ export default function ProjectDetailPage({ projectId }: ProjectDetailPageProps)
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <div className={styles.metaRow}>
-          <div className={styles.metaLeft}>
-            <FolderOutlined style={{ color: "rgba(0,0,0,0.45)" }} />
-            <Typography.Text className={styles.metaSlug}>
-              {project.slug ?? project.id.toLowerCase()}
-            </Typography.Text>
-            <span className={styles.metaDivider}>·</span>
-            <Typography.Text type="secondary">{project.category}</Typography.Text>
-            <Tag color={statusTagColor[project.status]}>{statusLabel[project.status]}</Tag>
-          </div>
-          <Space>
-            <Button icon={<MessageOutlined />}>채팅</Button>
-            <Button icon={<EditOutlined />}>수정</Button>
-            <Button danger icon={<DeleteOutlined />} />
-          </Space>
-        </div>
-
         <div className={styles.infoRow}>
           <span className={styles.infoItem}>
             <EnvironmentOutlined />
